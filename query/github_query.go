@@ -1,4 +1,4 @@
-package main
+package query
 
 import (
 	"context"
@@ -13,11 +13,11 @@ type GithubUserQuery interface {
 	Query(context.Context) error
 }
 
-type githubQuery struct {
+type GithubQuery struct {
 	weaver.Implements[GithubUserQuery]
 }
 
-func (gq *githubQuery) Query(ctx context.Context) error {
+func (gq *GithubQuery) Query(ctx context.Context) error {
 	var query struct {
 		Viewer struct {
 			Login     githubv4.String
