@@ -33,9 +33,10 @@ func init() {
 		RefData: "",
 	})
 	codegen.Register(codegen.Registration{
-		Name:  "github.com/ServiceWeaver/weaver/Main",
-		Iface: reflect.TypeOf((*weaver.Main)(nil)).Elem(),
-		Impl:  reflect.TypeOf(app{}),
+		Name:      "github.com/ServiceWeaver/weaver/Main",
+		Iface:     reflect.TypeOf((*weaver.Main)(nil)).Elem(),
+		Impl:      reflect.TypeOf(app{}),
+		Listeners: []string{"proto"},
 		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
 			return main_local_stub{impl: impl.(weaver.Main), tracer: tracer}
 		},
@@ -46,7 +47,7 @@ func init() {
 		ReflectStubFn: func(caller func(string, context.Context, []any, []any) error) any {
 			return main_reflect_stub{caller: caller}
 		},
-		RefData: "⟦68914653:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→prototype/GithubUserQuery⟧\n",
+		RefData: "⟦68914653:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→prototype/GithubUserQuery⟧\n⟦b00836f0:wEaVeRlIsTeNeRs:github.com/ServiceWeaver/weaver/Main→proto⟧\n",
 	})
 }
 
