@@ -17,13 +17,6 @@ type githubQuery struct {
 	weaver.Implements[GithubUserQuery]
 }
 
-//var (
-//	GithubUserQueryRequests = metrics.NewCounter(
-//		"add_count",
-//		"number of github_user_query_requests called",
-//	)
-//)
-
 func (gq *githubQuery) Query(ctx context.Context) error {
 	var query struct {
 		Viewer struct {
@@ -44,6 +37,5 @@ func (gq *githubQuery) Query(ctx context.Context) error {
 		log.Fatal(err2)
 	}
 	gq.Logger(ctx).Debug("GithubUserQuery", "query", query)
-	//GithubUserQueryRequests.Inc()
 	return nil
 }
