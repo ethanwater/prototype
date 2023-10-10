@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"net/http"
+	"prototype/query"
 
 	"github.com/ServiceWeaver/weaver"
 )
@@ -20,7 +21,7 @@ func main() {
 type app struct {
 	weaver.Implements[weaver.Main]
 	//subscriber weaver.Ref[Subscriber]
-	query    weaver.Ref[GithubUserQuery]
+	query    weaver.Ref[query.GithubUserQuery]
 	listener weaver.Listener `weaver:"proto"`
 }
 
