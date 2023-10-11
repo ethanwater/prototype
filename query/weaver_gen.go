@@ -51,7 +51,7 @@ type githubUserQuery_local_stub struct {
 // Check that githubUserQuery_local_stub implements the GithubUserQuery interface.
 var _ GithubUserQuery = (*githubUserQuery_local_stub)(nil)
 
-func (s githubUserQuery_local_stub) Query(ctx context.Context) (err error) {
+func (s githubUserQuery_local_stub) Query(ctx context.Context, a0 string) (r0 []string, err error) {
 	// Update metrics.
 	begin := s.queryMetrics.Begin()
 	defer func() { s.queryMetrics.End(begin, err != nil, 0, 0) }()
@@ -68,7 +68,7 @@ func (s githubUserQuery_local_stub) Query(ctx context.Context) (err error) {
 		}()
 	}
 
-	return s.impl.Query(ctx)
+	return s.impl.Query(ctx, a0)
 }
 
 // Client stub implementations.
@@ -81,7 +81,7 @@ type githubUserQuery_client_stub struct {
 // Check that githubUserQuery_client_stub implements the GithubUserQuery interface.
 var _ GithubUserQuery = (*githubUserQuery_client_stub)(nil)
 
-func (s githubUserQuery_client_stub) Query(ctx context.Context) (err error) {
+func (s githubUserQuery_client_stub) Query(ctx context.Context, a0 string) (r0 []string, err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
 	begin := s.queryMetrics.Begin()
@@ -110,11 +110,20 @@ func (s githubUserQuery_client_stub) Query(ctx context.Context) (err error) {
 
 	}()
 
+	// Preallocate a buffer of the right size.
+	size := 0
+	size += (4 + len(a0))
+	enc := codegen.NewEncoder()
+	enc.Reset(size)
+
+	// Encode arguments.
+	enc.String(a0)
 	var shardKey uint64
 
 	// Call the remote method.
+	requestBytes = len(enc.Data())
 	var results []byte
-	results, err = s.stub.Run(ctx, 0, nil, shardKey)
+	results, err = s.stub.Run(ctx, 0, enc.Data(), shardKey)
 	replyBytes = len(results)
 	if err != nil {
 		err = errors.Join(weaver.RemoteCallError, err)
@@ -123,6 +132,7 @@ func (s githubUserQuery_client_stub) Query(ctx context.Context) (err error) {
 
 	// Decode the results.
 	dec := codegen.NewDecoder(results)
+	r0 = serviceweaver_dec_slice_string_4af10117(dec)
 	err = dec.Error()
 	return
 }
@@ -178,13 +188,19 @@ func (s githubUserQuery_server_stub) query(ctx context.Context, args []byte) (re
 		}
 	}()
 
+	// Decode arguments.
+	dec := codegen.NewDecoder(args)
+	var a0 string
+	a0 = dec.String()
+
 	// TODO(rgrandl): The deferred function above will recover from panics in the
 	// user code: fix this.
 	// Call the local method.
-	appErr := s.impl.Query(ctx)
+	r0, appErr := s.impl.Query(ctx, a0)
 
 	// Encode the results.
 	enc := codegen.NewEncoder()
+	serviceweaver_enc_slice_string_4af10117(enc, r0)
 	enc.Error(appErr)
 	return enc.Data(), nil
 }
@@ -198,7 +214,32 @@ type githubUserQuery_reflect_stub struct {
 // Check that githubUserQuery_reflect_stub implements the GithubUserQuery interface.
 var _ GithubUserQuery = (*githubUserQuery_reflect_stub)(nil)
 
-func (s githubUserQuery_reflect_stub) Query(ctx context.Context) (err error) {
-	err = s.caller("Query", ctx, []any{}, []any{})
+func (s githubUserQuery_reflect_stub) Query(ctx context.Context, a0 string) (r0 []string, err error) {
+	err = s.caller("Query", ctx, []any{a0}, []any{&r0})
 	return
+}
+
+// Encoding/decoding implementations.
+
+func serviceweaver_enc_slice_string_4af10117(enc *codegen.Encoder, arg []string) {
+	if arg == nil {
+		enc.Len(-1)
+		return
+	}
+	enc.Len(len(arg))
+	for i := 0; i < len(arg); i++ {
+		enc.String(arg[i])
+	}
+}
+
+func serviceweaver_dec_slice_string_4af10117(dec *codegen.Decoder) []string {
+	n := dec.Len()
+	if n == -1 {
+		return nil
+	}
+	res := make([]string, n)
+	for i := 0; i < n; i++ {
+		res[i] = dec.String()
+	}
+	return res
 }

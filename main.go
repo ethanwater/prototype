@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	_ "embed"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"prototype/query"
 
@@ -28,18 +30,34 @@ type app struct {
 func run(ctx context.Context, a *app) error {
 	a.Logger(ctx).Info("prototype run", "addr:", a.listener)
 
-	//http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-	//	if r.URL.Path != "/" {
-	//		http.NotFound(w, r)
-	//		return
-	//	}
-	//	if _, err := fmt.Fprint(w); err != nil {
-	//		a.Logger(r.Context()).Error("error writing index.html", "err", err)
-	//	}
-	//})
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
+		if _, err := fmt.Fprint(w); err != nil {
+			a.Logger(r.Context()).Error("error writing index.html", "err", err)
+		}
+	})
 
 	http.HandleFunc("/github_user_query", func(w http.ResponseWriter, r *http.Request) {
-		a.query.Get().Query(ctx)
+		query := r.URL.Query().Get("q")
+		user, err := a.query.Get().Query(r.Context(), query)
+		if err != nil {
+			a.Logger(r.Context()).Error("error getting query results", "err", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		bytes, err := json.Marshal(user)
+		if err != nil {
+			a.Logger(r.Context()).Error("error marshaling search results", "err", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
+			a.Logger(r.Context()).Error("error writing search results", "err", err)
+		}
 	})
 
 	//novuClient := novu.NewAPIClient("93e56d580ce3386f02eb1ca728c0c2f2", &novu.Config{})
