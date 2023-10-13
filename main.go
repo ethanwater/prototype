@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"prototype/query"
+	"prototype/subscriber"
 
 	"github.com/ServiceWeaver/weaver"
 )
@@ -22,9 +23,9 @@ func main() {
 
 type app struct {
 	weaver.Implements[weaver.Main]
-	//subscriber weaver.Ref[Subscriber]
-	query    weaver.Ref[query.GithubUserQuery]
-	listener weaver.Listener `weaver:"proto"`
+	query      weaver.Ref[query.GithubUserQuery]
+	subscriber weaver.Ref[subscriber.SubscriberInterface]
+	listener   weaver.Listener `weaver:"proto"`
 }
 
 func run(ctx context.Context, a *app) error {
@@ -60,11 +61,32 @@ func run(ctx context.Context, a *app) error {
 		}
 	})
 
-	//novuClient := novu.NewAPIClient("93e56d580ce3386f02eb1ca728c0c2f2", &novu.Config{})
-	//stat, err3 := a.subscriber.Get().InitSubscriber(ctx, novuClient, query.Viewer.Email)
-	//if err3 != nil {
-	//	return err3
-	//}
+	http.HandleFunc("/subscribe", func(w http.ResponseWriter, r *http.Request) {
+		query := r.URL.Query().Get("q")
+		user, err := a.query.Get().Query(r.Context(), query)
+		if err != nil {
+			a.Logger(r.Context()).Error("error getting query results", "err", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		err = a.subscriber.Get().InitSubscriber(r.Context(), user[2])
+		if err != nil {
+			a.Logger(r.Context()).Error("error subsscribing", "err", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		bytes, err := json.Marshal(user)
+		if err != nil {
+			a.Logger(r.Context()).Error("error marshaling search results", "err", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
+			a.Logger(r.Context()).Error("error writing search results", "err", err)
+		}
+	})
 
 	return http.Serve(a.listener, nil)
 }
