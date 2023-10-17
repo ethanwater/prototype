@@ -45,7 +45,7 @@ func (gq *GithubQuery) Query(ctx context.Context, user string) ([]string, error)
 	if err2 != nil {
 		gq.Logger(ctx).Error("GithubUserQuery couldn't fetch", "error:", err2)
 	} else {
-		gq.Logger(ctx).Debug("GithubUserQuery fetched user", "result:", user_query.RepositoryOwner.Login)
+		gq.Logger(ctx).Debug("GithubUserQuery fetched user", "result:", user_query.RepositoryOwner)
 	}
 
 	if user_query.RepositoryOwner.Email == "" {
