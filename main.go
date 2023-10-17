@@ -12,6 +12,9 @@ import (
 	"github.com/ServiceWeaver/weaver"
 )
 
+//go:embed index.html
+var indexHTML string
+
 // net/http: https://pkg.go.dev/net/http#pkg-overview
 // serviceweaver: https://serviceweaver.dev/docs.html#components
 
@@ -36,7 +39,7 @@ func run(ctx context.Context, a *app) error {
 			http.NotFound(w, r)
 			return
 		}
-		if _, err := fmt.Fprint(w); err != nil {
+		if _, err := fmt.Fprint(w, indexHTML); err != nil {
 			a.Logger(r.Context()).Error("error writing index.html", "err", err)
 		}
 	})
