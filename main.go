@@ -8,14 +8,15 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"prototype/query"
-	"prototype/subscriber"
+	"prototype/pkg/subscriber"
+
+	"prototype/pkg/query"
 
 	"github.com/ServiceWeaver/weaver"
 	"github.com/go-sql-driver/mysql"
 )
 
-//go:embed index.html
+//go:embed ui/index.html
 var indexHTML string
 
 var db *sql.DB

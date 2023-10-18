@@ -27,7 +27,7 @@ func init() {
 		ReflectStubFn: func(caller func(string, context.Context, []any, []any) error) any {
 			return main_reflect_stub{caller: caller}
 		},
-		RefData: "⟦2f2dc3f9:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→prototype/query/GithubUserQuery⟧\n⟦ce7421c4:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→prototype/subscriber/SubscriberInterface⟧\n⟦b00836f0:wEaVeRlIsTeNeRs:github.com/ServiceWeaver/weaver/Main→proto⟧\n",
+		RefData: "⟦94c2fd2b:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→prototype/pkg/query/GithubUserQuery⟧\n⟦63b9c75a:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→prototype/pkg/subscriber/SubscriberInterface⟧\n⟦b00836f0:wEaVeRlIsTeNeRs:github.com/ServiceWeaver/weaver/Main→proto⟧\n",
 	})
 }
 
