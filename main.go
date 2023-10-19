@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"prototype/pkg/subscriber"
 
 	"prototype/pkg/query"
@@ -109,32 +110,36 @@ func run(ctx context.Context, a *app) error {
 		}
 	})
 
-	http.HandleFunc("/subscribe", func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query().Get("q")
-		user, err := a.query.Get().Query(r.Context(), query)
-		if err != nil {
-			a.Logger(r.Context()).Error("error getting query results", "err", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		err = a.subscriber.Get().InitSubscriber(r.Context(), user[2])
-		if err != nil {
-			a.Logger(r.Context()).Error("error subsscribing", "err", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		bytes, err := json.Marshal(user)
-		if err != nil {
-			a.Logger(r.Context()).Error("error marshaling search results", "err", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
-			a.Logger(r.Context()).Error("error writing search results", "err", err)
-		}
+	http.HandleFunc("/kill", func(w http.ResponseWriter, r *http.Request) {
+		os.Exit(1)
 	})
+
+	//http.HandleFunc("/subscribe", func(w http.ResponseWriter, r *http.Request) {
+	//	query := r.URL.Query().Get("q")
+	//	user, err := a.query.Get().Query(r.Context(), query)
+	//	if err != nil {
+	//		a.Logger(r.Context()).Error("error getting query results", "err", err)
+	//		http.Error(w, err.Error(), http.StatusInternalServerError)
+	//		return
+	//	}
+
+	//	err = a.subscriber.Get().InitSubscriber(r.Context(), user[2])
+	//	if err != nil {
+	//		a.Logger(r.Context()).Error("error subsscribing", "err", err)
+	//		http.Error(w, err.Error(), http.StatusInternalServerError)
+	//		return
+	//	}
+
+	//	bytes, err := json.Marshal(user)
+	//	if err != nil {
+	//		a.Logger(r.Context()).Error("error marshaling search results", "err", err)
+	//		http.Error(w, err.Error(), http.StatusInternalServerError)
+	//		return
+	//	}
+	//	if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
+	//		a.Logger(r.Context()).Error("error writing search results", "err", err)
+	//	}
+	//})
 
 	return http.Serve(a.listener, nil)
 }
