@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 
 	"fmt"
 	"log"
@@ -16,10 +15,10 @@ import (
 
 type App struct {
 	weaver.Implements[weaver.Main]
-	handles       weaver.Ref[handleInterface]
-	listener      weaver.Listener `weaver:"vivian"`
-	read_timeout  time.Duration
-	write_timeout time.Duration
+	serverControls weaver.Ref[handleInterface]
+	listener       weaver.Listener `weaver:"vivian"`
+	read_timeout   time.Duration
+	write_timeout  time.Duration
 
 	handler  http.Handler
 	database *sql.DB
@@ -45,25 +44,7 @@ func Deploy(ctx context.Context, app *App) error {
 	appHandler.Handle("/kill", serverControls{}.kill(ctx, app))
 	appHandler.Handle("/add", serverControls{}.add(ctx, app))
 	appHandler.HandleFunc(weaver.HealthzURL, weaver.HealthzHandler)
-	appHandler.HandleFunc("/echo", func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query().Get("q")
-		echo, err := app.handles.Get().InnerEcho(r.Context(), query)
-		if err != nil {
-			app.Logger(r.Context()).Error("error getting query results", "err", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		bytes, err := json.Marshal(echo)
-		if err != nil {
-			app.Logger(r.Context()).Error("error marshaling search results", "err", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
-			app.Logger(r.Context()).Error("error writing search results", "err", err)
-		}
-		app.Logger(ctx).Debug("echo", "echo", echo)
-	})
+	appHandler.Handle("/echo", serverControls{}.echo(ctx, app))
 
 	return http.Serve(app.listener, app.handler)
 }

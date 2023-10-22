@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	_ "embed"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -42,21 +43,30 @@ func (serverControls) kill(ctx context.Context, app *App) http.Handler {
 
 func (s *serverControls) InnerEcho(ctx context.Context, query string) (string, error) {
 	return query, nil
-
 }
 
-//func (serverControls) echo(ctx context.Context, app *App) http.Handler {
-//	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-//		query := r.URL.Query().Get("q")
-//		echo, err := innerEcho(r.Context(), query)
-//		if err != nil {
-//			app.Logger(r.Context()).Error("error getting query results", "err", err)
-//			http.Error(w, err.Error(), http.StatusInternalServerError)
-//			return
-//		}
-//		app.Logger(ctx).Debug("echo", "echo", echo)
-//	})
-//}
+func (serverControls) echo(ctx context.Context, app *App) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		query := r.URL.Query().Get("q")
+		echo, err := app.serverControls.Get().InnerEcho(r.Context(), query)
+		if err != nil {
+			app.Logger(r.Context()).Error("error getting query results", "err", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		bytes, err := json.Marshal(echo)
+		if err != nil {
+			app.Logger(r.Context()).Error("error marshaling search results", "err", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
+			app.Logger(r.Context()).Error("error writing search results", "err", err)
+		}
+		app.Logger(ctx).Debug("echo", "echo", echo)
+	})
+
+}
 
 func (serverControls) add(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
