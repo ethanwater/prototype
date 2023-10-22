@@ -2,21 +2,34 @@ package app
 
 import (
 	"context"
+	_ "embed"
+	"fmt"
 	"net/http"
 	"os"
 
+	"github.com/ServiceWeaver/weaver"
 	"github.com/ServiceWeaver/weaver/metrics"
 )
 
+//go:embed index.html
+var indexHTML string
 var databaseAdd = metrics.NewCounter("USER added", "values addded to database")
 
-type serverControls struct{}
+type handleInterface interface {
+	InnerEcho(context.Context, string) (string, error)
+}
+type serverControls struct {
+	weaver.Implements[handleInterface]
+}
 
-func (s serverControls) base() http.Handler {
+func (s serverControls) base(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
 			return
+		}
+		if _, err := fmt.Fprint(w, indexHTML); err != nil {
+			app.Logger(ctx).Error("error writing index.html", "err", err)
 		}
 	})
 }
@@ -27,12 +40,23 @@ func (serverControls) kill(ctx context.Context, app *App) http.Handler {
 	})
 }
 
-func (serverControls) echo(ctx context.Context, app *App) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query().Get("q")
-		app.Logger(ctx).Debug("echo", "echo", query)
-	})
+func (s *serverControls) InnerEcho(ctx context.Context, query string) (string, error) {
+	return query, nil
+
 }
+
+//func (serverControls) echo(ctx context.Context, app *App) http.Handler {
+//	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//		query := r.URL.Query().Get("q")
+//		echo, err := innerEcho(r.Context(), query)
+//		if err != nil {
+//			app.Logger(r.Context()).Error("error getting query results", "err", err)
+//			http.Error(w, err.Error(), http.StatusInternalServerError)
+//			return
+//		}
+//		app.Logger(ctx).Debug("echo", "echo", echo)
+//	})
+//}
 
 func (serverControls) add(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
