@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	_ "embed"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,8 +11,6 @@ import (
 	"github.com/ServiceWeaver/weaver/metrics"
 )
 
-//go:embed index.html
-var indexHTML string
 var databaseAdd = metrics.NewCounter("USER added", "values addded to database")
 
 type handleInterface interface {
@@ -23,17 +20,6 @@ type serverControls struct {
 	weaver.Implements[handleInterface]
 }
 
-func (s serverControls) base(ctx context.Context, app *App) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
-			http.NotFound(w, r)
-			return
-		}
-		if _, err := fmt.Fprint(w, indexHTML); err != nil {
-			app.Logger(ctx).Error("error writing index.html", "err", err)
-		}
-	})
-}
 func (serverControls) kill(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		app.Logger(ctx).Warn("vivian: kill server...", "status code", 0)

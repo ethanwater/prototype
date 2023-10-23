@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"database/sql"
+	"vivian/frontend"
 
 	"fmt"
 	"log"
@@ -40,7 +41,7 @@ func Deploy(ctx context.Context, app *App) error {
 
 	app.Logger(ctx).Info("vivian: app deployed", "address", app.listener)
 
-	appHandler.Handle("/", serverControls{}.base(ctx, app))
+	appHandler.Handle("/", http.StripPrefix("/", http.FileServer(http.FS(frontend.WebUI))))
 	appHandler.Handle("/kill", serverControls{}.kill(ctx, app))
 	appHandler.Handle("/add", serverControls{}.add(ctx, app))
 	appHandler.HandleFunc(weaver.HealthzURL, weaver.HealthzHandler)
