@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"vivian/pkg/app"
+	"vivian/pkg/server"
 
 	"github.com/ServiceWeaver/weaver"
 )
 
 func main() {
-	if err := weaver.Run(context.Background(), app.Deploy); err != nil {
+	if err := weaver.Run(context.Background(), server.Deploy); err != nil {
 		panic(err)
 	}
 }
