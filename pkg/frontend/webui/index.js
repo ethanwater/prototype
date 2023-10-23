@@ -30,7 +30,6 @@ function main() {
   const loader = document.getElementById('test');
   const timer = document.getElementById('time');
   query.focus();
-  button.hidden = false;
   echoButton.hidden = false;
 
   let controller; 
@@ -43,8 +42,7 @@ function main() {
 
     for (const endpoint of ['add']) {
       add(endpoint, query.value, controller.signal).then((x) => {
-        const results = JSON.parse(x);
-
+        JSON.parse(x);
       })
     }
   }
@@ -91,9 +89,9 @@ function main() {
 
   query.addEventListener('input', (e) => {
     if (strip(query.value) == "") {
-      button.disabled = true;
+      addButton.disabled = true;
     } else {
-      button.disabled = false;
+      echoButton.disabled = false;
     }
   });
 }

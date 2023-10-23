@@ -16,6 +16,7 @@ require (
 	github.com/google/cel-go v0.17.1 // indirect
 	github.com/google/pprof v0.0.0-20230705174524-200ffdc848b8 // indirect
 	github.com/google/uuid v1.3.1 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/lightstep/varopt v1.3.0 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
