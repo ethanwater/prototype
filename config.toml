@@ -1,9 +1,0 @@
-[vivian]
-version = "alpha v1.0.0"
-
-[single]
-listeners.vivian = {address = "localhost:9000"}
-
-[database]
-name = "user_queries"
-address = "127.0.0.1:3306"
