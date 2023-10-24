@@ -9,10 +9,18 @@ body {
     text-align: center;
 }
 
+#status {
+  font-size: 10px;
+}
+
 p {
     text-align: center;
     margin: auto;
     margin-top: 20px;
+    color: #ff4a56;
+    font-family: Helvetica, sans-serif;
+    font-weight: light;
+    -webkit-font-smoothing: antialiased;
 }
 .transition, form button, form .question label, form .question input[type="text"] {
     -moz-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
@@ -36,7 +44,6 @@ p {
     padding: 30px 25px;
     background-color: white;
     border-radius: 40px;
-    margin: 40px 0;
     left: 50%;
     -moz-transform: translate(-50%, 0);
     -ms-transform: translate(-50%, 0);
@@ -51,7 +58,6 @@ p {
     margin-bottom: 35px;
   }
   button {
-    margin-top: 35px;
     background-color: white;
     border: 1px solid #ff4a56;
     line-height: 0;
@@ -81,6 +87,7 @@ p {
     padding-bottom: 0;
   }
   form .question label {
+    font-style: italic;
     transform-origin: left center;
     color: white;
     font-weight: 100;
@@ -115,20 +122,16 @@ p {
     outline: none;
     background: white;
     color: #ff4a5e;
-    margin-top: 30px;
   }
-  form .question input[type="text"]:valid {
-    margin-top: 30px;
-  }
+
   form .question input[type="text"]:focus ~ label {
     color: #ff4a56;
-    -moz-transform: translate(0, -35px);
-    -ms-transform: translate(0, -35px);
-    -webkit-transform: translate(0, -35px);
-    transform: translate(0, -35px);
+    -moz-transform: translate(5px, -35px) scale(0.6);
+    -ms-transform: translate(5px, -35px) scale(0.6);
+    -webkit-transform: translate(5px, -35px) scale(0.6);
+    transform: translate(5px, -35px) scale(0.6);
   }
   form .question input[type="text"]:valid ~ label {
-    text-transform: uppercase;
     font-style: italic;
     -moz-transform: translate(5px, -35px) scale(0.6);
     -ms-transform: translate(5px, -35px) scale(0.6);

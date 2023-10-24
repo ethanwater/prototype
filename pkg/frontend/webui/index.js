@@ -20,7 +20,16 @@ async function add(endpoint, query, aborter) {
   } else {
     throw new Error(text);
   }
+}
 
+async function dbstatus(endpoint, aborter) {
+  const response = await fetch(`/${endpoint}`, {signal: aborter}); 
+  const text = await response.text();
+  if (response.ok) {
+    return text;
+  } else {
+    throw new Error(text);
+  } 
 }
 
 function main() {
@@ -29,13 +38,36 @@ function main() {
   const echoButton = document.getElementById('echo');
   const loader = document.getElementById('test');
   const timer = document.getElementById('time');
+  const status = document.getElementById('status');
 
-  query.focus();
   addButton.disabled = true;
   echoButton.disabled = true;
 
   let controller; 
   let pending = 0; 
+
+  const pingdb = () => {
+    if (controller != undefined) {
+      controller.abort();
+    }
+    controller = new AbortController();
+
+    for (const endpoint of ['ping']) {
+      dbstatus(endpoint, controller.signal).then((x) => {
+        const results = JSON.parse(strip(x));
+        if (results == null || results.length == 0) {
+          status.innerText = "...";
+        } else {
+          status.innerText = "connected to SQL database: " + x.replace(/"/g, "");
+        } 
+      }).finally(() => {
+        pending--;
+        if (pending == 0) {
+        }
+      });
+    }
+  }
+
   const add_user = () => {
     if(controller != undefined) {
       controller.abort();
@@ -43,9 +75,24 @@ function main() {
     controller = new AbortController();
 
     for (const endpoint of ['add']) {
+      if (pending == 0) {
+        loader.hidden = false;
+      }
+      pending++;
+      var start_time = performance.now();
       add(endpoint, query.value, controller.signal).then((x) => {
-        JSON.parse(x);
-      })
+        const results = JSON.parse(strip(x));
+        if (results == null || results.length == 0) {
+          loader.innerText = "...";
+        } else {
+          loader.innerText = x.replace(/"/g, "");
+        }
+      }).finally(() => {
+        pending--;
+        if (pending == 0) {
+        }
+      });
+      timer.innerText = (performance.now() - start_time) + "ms";
     }
   }
 
@@ -65,29 +112,24 @@ function main() {
       echoResponse(endpoint, query.value, controller.signal).then((v) => {
         const results = JSON.parse(v);
         if (results == null || results.length == 0) {
-          loader.innerHTML = "red";
+          loader.innerText = "...";
+          timer.innerText = "...";
         } else {
-          loader.innerHTML = v;
+          loader.innerText = "vivian: " + v.replace(/"/g, "");
         }
       }).finally(() => {
         pending--;
         if (pending == 0) {
-          //loader.hidden = true;
         }
       });
-      var end_time = performance.now();
-      timer.innerHTML = (end_time - start_time);
+      timer.innerText = (performance.now() - start_time) + "ms";
     }
   }
 
+
+  pingdb();
   addButton.addEventListener('click', add_user);
   echoButton.addEventListener('click', echo);
-
-  //query.addEventListener('keypress', (e) => {
-  //  if (e.key == 'Enter' && strip(query.value) != "") {
-  //    perform_search();
-  //  }
-  //});
 
   query.addEventListener('input', (e) => {
     if (strip(query.value) == "") {

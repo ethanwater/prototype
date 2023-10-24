@@ -25,6 +25,7 @@ type Server struct {
 	write_timeout time.Duration
 	mu            sync.Mutex
 
+	db_name  string
 	handler  http.Handler
 	database *sql.DB
 }
@@ -43,6 +44,7 @@ func Deploy(ctx context.Context, app *Server) error {
 	app.read_timeout = 10 * time.Second
 	app.write_timeout = 10 * time.Second
 	app.database = EstablishLinkDatabase(ctx, app)
+	app.db_name = "users"
 
 	app.Logger(ctx).Info("vivian: app deployed", "address", app.listener)
 
@@ -50,6 +52,7 @@ func Deploy(ctx context.Context, app *Server) error {
 	appHandler.Handle("/kill", serverControls{}.kill(ctx, app))
 	appHandler.Handle("/add", serverControls{}.add(ctx, app))
 	appHandler.Handle("/echo", serverControls{}.echo(ctx, app))
+	appHandler.Handle("/ping", serverControls{}.ping(ctx, app))
 	appHandler.HandleFunc(weaver.HealthzURL, weaver.HealthzHandler)
 
 	return http.Serve(app.listener, app.handler)
