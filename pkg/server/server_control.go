@@ -21,8 +21,10 @@ type serverControls struct {
 }
 
 func (serverControls) kill(ctx context.Context, app *Server) http.Handler {
+	app.mu.Lock()
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		app.Logger(ctx).Warn("vivian: kill server...", "status code", 0)
+		app.Logger(ctx).Warn("vivian: kill server...", "status code", 0, http.ErrServerClosed)
+		defer app.mu.Unlock()
 		os.Exit(0)
 	})
 }

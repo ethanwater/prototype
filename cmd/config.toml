@@ -1,5 +1,6 @@
 [vivian]
 version = "alpha v1.0.0"
+port = ":9000"
 
 [single]
 listeners.vivian = {address = "localhost:9000"}

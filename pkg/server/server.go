@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"database/sql"
+	"sync"
 	"vivian/pkg/frontend"
 
 	"fmt"
@@ -18,8 +19,11 @@ type Server struct {
 	weaver.Implements[weaver.Main]
 	serverControls weaver.Ref[handleInterface]
 	listener       weaver.Listener `weaver:"vivian"`
-	read_timeout   time.Duration
-	write_timeout  time.Duration
+
+	addr          string
+	read_timeout  time.Duration
+	write_timeout time.Duration
+	mu            sync.Mutex
 
 	handler  http.Handler
 	database *sql.DB
@@ -34,6 +38,7 @@ func Deploy(ctx context.Context, app *Server) error {
 	}
 
 	appHandler := http.NewServeMux()
+	app.addr = ":9000"
 	app.handler = appHandler
 	app.read_timeout = 10 * time.Second
 	app.write_timeout = 10 * time.Second

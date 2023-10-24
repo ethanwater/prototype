@@ -29,8 +29,10 @@ function main() {
   const echoButton = document.getElementById('echo');
   const loader = document.getElementById('test');
   const timer = document.getElementById('time');
+
   query.focus();
-  echoButton.hidden = false;
+  addButton.disabled = true;
+  echoButton.disabled = true;
 
   let controller; 
   let pending = 0; 
@@ -90,7 +92,9 @@ function main() {
   query.addEventListener('input', (e) => {
     if (strip(query.value) == "") {
       addButton.disabled = true;
+      echoButton.disabled = true;
     } else {
+      addButton.disabled = false;
       echoButton.disabled = false;
     }
   });
