@@ -1,0 +1,13 @@
+[vivian]
+version = "alpha v1.0.0"
+port = ":9000"
+
+[serviceweaver]
+binary = "vivian"
+
+[multi]
+listeners.vivian = {address = "localhost:9000"}
+
+[database]
+name = "user_queries"
+address = "127.0.0.1:3306"
