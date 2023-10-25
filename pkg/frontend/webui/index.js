@@ -94,6 +94,7 @@ function main() {
       });
       timer.innerText = (performance.now() - start_time) + "ms";
     }
+		//query.value = strip("");
   }
 
   const echo = () => {
@@ -124,6 +125,7 @@ function main() {
       });
       timer.innerText = (performance.now() - start_time) + "ms";
     }
+		//query.value = strip("");
   }
 
 
@@ -135,6 +137,8 @@ function main() {
     if (strip(query.value) == "") {
       addButton.disabled = true;
       echoButton.disabled = true;
+			loader.innerText = "...";
+			timer.innerText = "...";
     } else {
       addButton.disabled = false;
       echoButton.disabled = false;
