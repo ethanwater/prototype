@@ -36,10 +36,10 @@ func init() {
 		Iface: reflect.TypeOf((*handleInterface)(nil)).Elem(),
 		Impl:  reflect.TypeOf(serverControls{}),
 		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
-			return handleInterface_local_stub{impl: impl.(handleInterface), tracer: tracer, addMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/handleInterface", Method: "Add", Remote: false}), innerEchoMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/handleInterface", Method: "InnerEcho", Remote: false}), pingMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/handleInterface", Method: "Ping", Remote: false})}
+			return handleInterface_local_stub{impl: impl.(handleInterface), tracer: tracer, addMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/handleInterface", Method: "Add", Remote: false}), innerEchoMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/handleInterface", Method: "InnerEcho", Remote: false})}
 		},
 		ClientStubFn: func(stub codegen.Stub, caller string) any {
-			return handleInterface_client_stub{stub: stub, addMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/handleInterface", Method: "Add", Remote: true}), innerEchoMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/handleInterface", Method: "InnerEcho", Remote: true}), pingMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/handleInterface", Method: "Ping", Remote: true})}
+			return handleInterface_client_stub{stub: stub, addMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/handleInterface", Method: "Add", Remote: true}), innerEchoMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/handleInterface", Method: "InnerEcho", Remote: true})}
 		},
 		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
 			return handleInterface_server_stub{impl: impl.(handleInterface), addLoad: addLoad}
@@ -74,7 +74,6 @@ type handleInterface_local_stub struct {
 	tracer           trace.Tracer
 	addMetrics       *codegen.MethodMetrics
 	innerEchoMetrics *codegen.MethodMetrics
-	pingMetrics      *codegen.MethodMetrics
 }
 
 // Check that handleInterface_local_stub implements the handleInterface interface.
@@ -120,26 +119,6 @@ func (s handleInterface_local_stub) InnerEcho(ctx context.Context, a0 string) (r
 	return s.impl.InnerEcho(ctx, a0)
 }
 
-func (s handleInterface_local_stub) Ping(ctx context.Context, a0 string) (r0 string, err error) {
-	// Update metrics.
-	begin := s.pingMetrics.Begin()
-	defer func() { s.pingMetrics.End(begin, err != nil, 0, 0) }()
-	span := trace.SpanFromContext(ctx)
-	if span.SpanContext().IsValid() {
-		// Create a child span for this method.
-		ctx, span = s.tracer.Start(ctx, "server.handleInterface.Ping", trace.WithSpanKind(trace.SpanKindInternal))
-		defer func() {
-			if err != nil {
-				span.RecordError(err)
-				span.SetStatus(codes.Error, err.Error())
-			}
-			span.End()
-		}()
-	}
-
-	return s.impl.Ping(ctx, a0)
-}
-
 // Client stub implementations.
 
 type main_client_stub struct {
@@ -153,7 +132,6 @@ type handleInterface_client_stub struct {
 	stub             codegen.Stub
 	addMetrics       *codegen.MethodMetrics
 	innerEchoMetrics *codegen.MethodMetrics
-	pingMetrics      *codegen.MethodMetrics
 }
 
 // Check that handleInterface_client_stub implements the handleInterface interface.
@@ -271,62 +249,6 @@ func (s handleInterface_client_stub) InnerEcho(ctx context.Context, a0 string) (
 	return
 }
 
-func (s handleInterface_client_stub) Ping(ctx context.Context, a0 string) (r0 string, err error) {
-	// Update metrics.
-	var requestBytes, replyBytes int
-	begin := s.pingMetrics.Begin()
-	defer func() { s.pingMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
-
-	span := trace.SpanFromContext(ctx)
-	if span.SpanContext().IsValid() {
-		// Create a child span for this method.
-		ctx, span = s.stub.Tracer().Start(ctx, "server.handleInterface.Ping", trace.WithSpanKind(trace.SpanKindClient))
-	}
-
-	defer func() {
-		// Catch and return any panics detected during encoding/decoding/rpc.
-		if err == nil {
-			err = codegen.CatchPanics(recover())
-			if err != nil {
-				err = errors.Join(weaver.RemoteCallError, err)
-			}
-		}
-
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, err.Error())
-		}
-		span.End()
-
-	}()
-
-	// Preallocate a buffer of the right size.
-	size := 0
-	size += (4 + len(a0))
-	enc := codegen.NewEncoder()
-	enc.Reset(size)
-
-	// Encode arguments.
-	enc.String(a0)
-	var shardKey uint64
-
-	// Call the remote method.
-	requestBytes = len(enc.Data())
-	var results []byte
-	results, err = s.stub.Run(ctx, 2, enc.Data(), shardKey)
-	replyBytes = len(results)
-	if err != nil {
-		err = errors.Join(weaver.RemoteCallError, err)
-		return
-	}
-
-	// Decode the results.
-	dec := codegen.NewDecoder(results)
-	r0 = dec.String()
-	err = dec.Error()
-	return
-}
-
 // Note that "weaver generate" will always generate the error message below.
 // Everything is okay. The error message is only relevant if you see it when
 // you run "go build" or "go run".
@@ -383,8 +305,6 @@ func (s handleInterface_server_stub) GetStubFn(method string) func(ctx context.C
 		return s.add
 	case "InnerEcho":
 		return s.innerEcho
-	case "Ping":
-		return s.ping
 	default:
 		return nil
 	}
@@ -440,31 +360,6 @@ func (s handleInterface_server_stub) innerEcho(ctx context.Context, args []byte)
 	return enc.Data(), nil
 }
 
-func (s handleInterface_server_stub) ping(ctx context.Context, args []byte) (res []byte, err error) {
-	// Catch and return any panics detected during encoding/decoding/rpc.
-	defer func() {
-		if err == nil {
-			err = codegen.CatchPanics(recover())
-		}
-	}()
-
-	// Decode arguments.
-	dec := codegen.NewDecoder(args)
-	var a0 string
-	a0 = dec.String()
-
-	// TODO(rgrandl): The deferred function above will recover from panics in the
-	// user code: fix this.
-	// Call the local method.
-	r0, appErr := s.impl.Ping(ctx, a0)
-
-	// Encode the results.
-	enc := codegen.NewEncoder()
-	enc.String(r0)
-	enc.Error(appErr)
-	return enc.Data(), nil
-}
-
 // Reflect stub implementations.
 
 type main_reflect_stub struct {
@@ -488,10 +383,5 @@ func (s handleInterface_reflect_stub) Add(ctx context.Context, a0 string) (r0 st
 
 func (s handleInterface_reflect_stub) InnerEcho(ctx context.Context, a0 string) (r0 string, err error) {
 	err = s.caller("InnerEcho", ctx, []any{a0}, []any{&r0})
-	return
-}
-
-func (s handleInterface_reflect_stub) Ping(ctx context.Context, a0 string) (r0 string, err error) {
-	err = s.caller("Ping", ctx, []any{a0}, []any{&r0})
 	return
 }

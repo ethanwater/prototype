@@ -52,7 +52,7 @@ func Deploy(ctx context.Context, app *Server) error {
 	appHandler.Handle("/kill", serverControls{}.kill(ctx, app))
 	appHandler.Handle("/add", serverControls{}.add(ctx, app))
 	appHandler.Handle("/echo", serverControls{}.echo(ctx, app))
-	appHandler.Handle("/ping", serverControls{}.ping(ctx, app))
+	//appHandler.Handle("/ping", serverControls{}.ping(ctx, app))
 	appHandler.HandleFunc(weaver.HealthzURL, weaver.HealthzHandler)
 
 	return http.Serve(app.listener, app.handler)

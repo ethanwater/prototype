@@ -22,16 +22,6 @@ async function add(endpoint, query, aborter) {
   }
 }
 
-async function dbstatus(endpoint, aborter) {
-  const response = await fetch(`/${endpoint}`, {signal: aborter}); 
-  const text = await response.text();
-  if (response.ok) {
-    return text;
-  } else {
-    throw new Error(text);
-  } 
-}
-
 function main() {
   const query = document.getElementById('pass');
   const addButton = document.getElementById('add');
@@ -40,33 +30,21 @@ function main() {
   const timer = document.getElementById('time');
   const status = document.getElementById('status');
 
+  const inputs = document.querySelectorAll('input');
+
+  inputs.forEach(input => {
+    input.setAttribute('autocomplete', 'off')
+    input.setAttribute('autocorrect', 'off')
+    input.setAttribute('autocapitalize', 'off')
+    input.setAttribute('spellcheck', false)
+  })
+
   addButton.disabled = true;
   echoButton.disabled = true;
+  status.innerText = location.hostname;
 
   let controller; 
   let pending = 0; 
-
-  const pingdb = () => {
-    if (controller != undefined) {
-      controller.abort();
-    }
-    controller = new AbortController();
-
-    for (const endpoint of ['ping']) {
-      dbstatus(endpoint, controller.signal).then((x) => {
-        const results = JSON.parse(strip(x));
-        if (results == null || results.length == 0) {
-          status.innerText = "...";
-        } else {
-          status.innerText = "connected to SQL database: " + x.replace(/"/g, "");
-        } 
-      }).finally(() => {
-        pending--;
-        if (pending == 0) {
-        }
-      });
-    }
-  }
 
   const add_user = () => {
     if(controller != undefined) {
@@ -84,6 +62,7 @@ function main() {
         const results = JSON.parse(strip(x));
         if (results == null || results.length == 0) {
           loader.innerText = "...";
+          timer.innerText = "...";
         } else {
           loader.innerText = x.replace(/"/g, "");
         }
@@ -94,7 +73,6 @@ function main() {
       });
       timer.innerText = (performance.now() - start_time) + "ms";
     }
-		//query.value = strip("");
   }
 
   const echo = () => {
@@ -125,13 +103,16 @@ function main() {
       });
       timer.innerText = (performance.now() - start_time) + "ms";
     }
-		//query.value = strip("");
   }
 
-
-  pingdb();
   addButton.addEventListener('click', add_user);
   echoButton.addEventListener('click', echo);
+
+  query.addEventListener('keypress', (e) => {
+    if (e.key == 'Enter' && strip(query.value) != "") {
+      echo();
+    }
+  });
 
   query.addEventListener('input', (e) => {
     if (strip(query.value) == "") {

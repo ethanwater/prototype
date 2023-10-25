@@ -17,7 +17,7 @@ var databaseAdd = metrics.NewCounter("USER added", "values addded to database")
 type handleInterface interface {
 	InnerEcho(context.Context, string) (string, error)
 	Add(context.Context, string) (string, error)
-	Ping(context.Context, string) (string, error)
+	//Ping(context.Context, string) (string, error)
 }
 type serverControls struct {
 	weaver.Implements[handleInterface]
@@ -40,30 +40,30 @@ func (s *serverControls) Add(ctx context.Context, query string) (string, error) 
 	return query, nil
 }
 
-func (s *serverControls) Ping(ctx context.Context, database string) (string, error) {
-	return database, nil
-}
-
-func (serverControls) ping(ctx context.Context, app *Server) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ping, err := app.serverControls.Get().Ping(r.Context(), app.db_name)
-		if err != nil {
-			app.Logger(r.Context()).Error("cant retrieve database name")
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-
-		bytes, err := json.Marshal(ping)
-		if err != nil {
-			app.Logger(r.Context()).Error("error marshaling results", "err", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
-			app.Logger(r.Context()).Error("error writing search results", "err", err)
-		}
-
-	})
-}
+//	func (s *serverControls) Ping(ctx context.Context, database string) (string, error) {
+//		return database, nil
+//	}
+//
+//	func (serverControls) ping(ctx context.Context, app *Server) http.Handler {
+//		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//			ping, err := app.serverControls.Get().Ping(r.Context(), app.db_name)
+//			if err != nil {
+//				app.Logger(r.Context()).Error("cant retrieve database")
+//				http.Error(w, err.Error(), http.StatusInternalServerError)
+//			}
+//
+//			bytes, err := json.Marshal(ping)
+//			if err != nil {
+//				app.Logger(r.Context()).Error("error marshaling results", "err", err)
+//				http.Error(w, err.Error(), http.StatusInternalServerError)
+//				return
+//			}
+//			if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
+//				app.Logger(r.Context()).Error("error writing search results", "err", err)
+//			}
+//
+//		})
+//	}
 func (serverControls) echo(ctx context.Context, app *Server) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		query := strings.TrimSpace(r.URL.Query().Get("q"))
