@@ -13,14 +13,15 @@ function strip(s) {
   }
   
   function main() {
+    const host = document.getElementById('host');
+    host.innerText = window.location.hostname;
+
     const query = document.getElementById('query');
     const addButton = document.getElementById('add');
     const loader = document.getElementById('test');
     const timer = document.getElementById('time');
-    const status = document.getElementById('status');
-  
     const inputs = document.querySelectorAll('input');
-  
+ 
     inputs.forEach(input => {
       input.setAttribute('autocomplete', 'off')
       input.setAttribute('autocorrect', 'off')
@@ -29,7 +30,6 @@ function strip(s) {
     })
   
     addButton.disabled = true;
-    status.innerText = location.hostname;
   
     let controller; 
     let pending = 0; 
@@ -63,14 +63,24 @@ function strip(s) {
       }
     }
   
-    addButton.addEventListener('click', add_user);
-  
+    //optimize these last two elements later, remove need to repeat
+		const echoApp = document.getElementById('echoApp');
+		//const addApp = document.getElementById('addApp');
+		const echoapp = () => {
+      window.location.assign("../apps-echo/index.html");
+		}
+    //const addapp = () => {
+    //  window.location.assign("index.html");
+		//}
+		echoApp.addEventListener('click', echoapp);
+		//addApp.addEventListener('click', addapp);
     query.addEventListener('keypress', (e) => {
       if (e.key == 'Enter' && strip(query.value) != "") {
-        echo();
-      }
+        add_user();
+      } 
     });
   
+    addButton.addEventListener('click', add_user);
     query.addEventListener('input', (e) => {
       if (strip(query.value) == "") {
         addButton.disabled = true;

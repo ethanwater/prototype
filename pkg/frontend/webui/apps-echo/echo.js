@@ -13,11 +13,13 @@ async function echoResponse(endpoint, query, aborter) {
 }
 
 function main() {
+  const host = document.getElementById('host');
+  host.innerText = window.location.hostname;
+
   const query = document.getElementById('query');
   const echoButton = document.getElementById('echo');
   const loader = document.getElementById('test');
   const timer = document.getElementById('time');
-  const status = document.getElementById('status');
 
   const inputs = document.querySelectorAll('input');
 
@@ -29,7 +31,6 @@ function main() {
   })
 
   echoButton.disabled = true;
-  status.innerText = location.hostname;
 
   let controller; 
   let pending = 0; 
@@ -65,14 +66,24 @@ function main() {
     }
   }
 
-  echoButton.addEventListener('click', echo);
-
+  //optimize these last two elements later, remove need to repeat
+  //const echoApp = document.getElementById('echoApp');
+  const addApp = document.getElementById('addApp');
+  //const echoapp = () => {
+  //  window.location.assign("index.html");
+  //}
+  const addapp = () => {
+    window.location.assign("../apps-adduser/index.html");
+  }
+  addApp.addEventListener('click', addapp);
+  //echoApp.addEventListener('click', echoapp);
   query.addEventListener('keypress', (e) => {
     if (e.key == 'Enter' && strip(query.value) != "") {
       echo();
     }
   });
 
+  echoButton.addEventListener('click', echo);
   query.addEventListener('input', (e) => {
     if (strip(query.value) == "") {
       echoButton.disabled = true;

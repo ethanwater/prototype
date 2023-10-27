@@ -12,6 +12,9 @@ import (
 	"github.com/ServiceWeaver/weaver/metrics"
 )
 
+const echoFailErr string = "vivian: FAIL! echo"
+const addFailErr string = "vivian: FAIL! database.add_user: "
+
 var databaseAdd = metrics.NewCounter("USER added", "values addded to database")
 
 type handleInterface interface {
@@ -69,18 +72,18 @@ func (serverControls) echo(ctx context.Context, app *Server) http.Handler {
 		query := strings.TrimSpace(r.URL.Query().Get("q"))
 		echo, err := app.serverControls.Get().InnerEcho(r.Context(), query)
 		if err != nil {
-			app.Logger(r.Context()).Error("error getting query results", "err", err)
+			app.Logger(r.Context()).Error(echoFailErr, "err", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		bytes, err := json.Marshal(echo)
 		if err != nil {
-			app.Logger(r.Context()).Error("error marshaling results", "err", err)
+			app.Logger(r.Context()).Error(echoFailErr, "err", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
-			app.Logger(r.Context()).Error("error writing search results", "err", err)
+			app.Logger(r.Context()).Error(echoFailErr, "err", err)
 		}
 		app.Logger(ctx).Debug("echo", "echo", echo)
 	})
@@ -93,12 +96,12 @@ func (serverControls) add(ctx context.Context, app *Server) http.Handler {
 		query := strings.TrimSpace(r.URL.Query().Get("q"))
 		result, err := app.database.Exec("INSERT INTO users (name) VALUES (?)", query)
 		if err != nil {
-			status = "vivian: FAIL! database.add_user: " + query
+			status = addFailErr + query
 			app.Logger(ctx).Debug(status, "err", err)
 		} else {
 			id, err := result.LastInsertId()
 			if err != nil {
-				status = "vivian: FAIL! database.add_user: " + query
+				status = addFailErr + query
 				app.Logger(ctx).Debug(status, "err", err)
 			} else {
 				databaseAdd.Inc()

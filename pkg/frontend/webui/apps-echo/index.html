@@ -10,30 +10,30 @@
   <body>
     <div class="field_interface">
       <h1>vivian</h1>      
-      <div class="app">
-        <h2><a href="index.html">echo</a></h2>
+      <p id="host">...</p>
+      <div class="app" style="background-color: lightpink;">
+        <h2>echo</h2>
       </div>
-      <div class="app">
-        <h2><a href="../apps-adduser/index.html">users</a></h2>
+      <div class="app" id="addApp">
+        <h2>users</h2>
       </div>
     </div>
 
     <div class="field_app">
-      <form>
-        <h2>echo</h2>   
-        <div class="container">
-          <p id="status">...</p>
-        </div>
+      <form onsubmit="return false;">
+      	<h2>echo</h2>   
         <div class="question">
           <input type="text" id="query"required/>
           <label>Query</label>
         </div>
       </form>
-      <div class="container">
-        <button id="echo">echo</button>
-        <p id="test">...</p>
-        <p id="time">...</p>
+      <div id="container">
+        <button id="echo">></button>
       </div>
+			<div id="container">
+				<p id="test">...</p>
+        <p id="time">...</p>
+			</div>
     </div>
   </body>
 </html>

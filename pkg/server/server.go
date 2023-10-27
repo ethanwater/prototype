@@ -20,7 +20,6 @@ type Server struct {
 	serverControls weaver.Ref[handleInterface]
 	listener       weaver.Listener `weaver:"vivian"`
 
-	addr          string
 	read_timeout  time.Duration
 	write_timeout time.Duration
 	mu            sync.Mutex
@@ -39,12 +38,11 @@ func Deploy(ctx context.Context, app *Server) error {
 	}
 
 	appHandler := http.NewServeMux()
-	app.addr = ":9000"
 	app.handler = appHandler
 	app.read_timeout = 10 * time.Second
 	app.write_timeout = 10 * time.Second
+	app.db_name = toml.Get("database.name").(string)
 	app.database = EstablishLinkDatabase(ctx, app)
-	app.db_name = "users"
 
 	app.Logger(ctx).Info("vivian: app deployed", "address", app.listener)
 
@@ -52,7 +50,6 @@ func Deploy(ctx context.Context, app *Server) error {
 	appHandler.Handle("/kill", serverControls{}.kill(ctx, app))
 	appHandler.Handle("/add", serverControls{}.add(ctx, app))
 	appHandler.Handle("/echo", serverControls{}.echo(ctx, app))
-	//appHandler.Handle("/ping", serverControls{}.ping(ctx, app))
 	appHandler.HandleFunc(weaver.HealthzURL, weaver.HealthzHandler)
 
 	return http.Serve(app.listener, app.handler)
