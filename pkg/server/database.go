@@ -10,10 +10,7 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
-const databaseFailErr string = "vivian: failure connecting to database"
-const databaseSuccessLog string = "vivian: connected to database"
-
-func EstablishLinkDatabase(ctx context.Context, app *Server) *sql.DB {
+func EstablishLinkDatabase(ctx context.Context) *sql.DB {
 	toml, err := toml.LoadFile("config.toml")
 
 	if err != nil {
@@ -29,17 +26,15 @@ func EstablishLinkDatabase(ctx context.Context, app *Server) *sql.DB {
 
 	database, err := sql.Open("mysql", config.FormatDSN())
 	if err != nil {
-		app.Logger(ctx).Error(databaseFailErr, "db", config.DBName)
 		os.Exit(1)
 	}
 
-	ping := database.Ping()
-	if ping != nil {
-		app.Logger(ctx).Error(databaseFailErr, "db", config.DBName, err)
-		os.Exit(2)
-	} else {
-		app.Logger(ctx).Debug(databaseSuccessLog, "db", config.DBName, "address", config.Addr)
-	}
+	go func() {
+		ping := database.Ping()
+		if ping != nil {
+			os.Exit(2)
+		}
+	}()
 
 	return database
 }
