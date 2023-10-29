@@ -69,14 +69,20 @@ function main() {
   //optimize these last two elements later, remove need to repeat
   //const echoApp = document.getElementById('echoApp');
   const addApp = document.getElementById('addApp');
-  //const echoapp = () => {
-  //  window.location.assign("index.html");
-  //}
+  const fetchApp = document.getElementById('fetchApp');
+
   const addapp = () => {
     window.location.assign("../apps-adduser/index.html");
   }
   addApp.addEventListener('click', addapp);
-  //echoApp.addEventListener('click', echoapp);
+
+  const fetchapp = () => {
+    window.location.assign("../apps-fetch/index.html");
+  }
+  fetchApp.addEventListener('click', fetchapp);
+
+
+
   query.addEventListener('keypress', (e) => {
     if (e.key == 'Enter' && strip(query.value) != "") {
       echo();

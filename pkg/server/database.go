@@ -10,7 +10,25 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
+type User struct {
+	ID   int
+	Name string
+}
+
 func EstablishLinkDatabase(ctx context.Context) *sql.DB {
+	database := FetchDatabase(ctx)
+
+	go func() {
+		ping := database.Ping()
+		if ping != nil {
+			os.Exit(2)
+		}
+	}()
+
+	return database
+}
+
+func FetchDatabase(ctx context.Context) *sql.DB {
 	toml, err := toml.LoadFile("config.toml")
 
 	if err != nil {
@@ -29,12 +47,31 @@ func EstablishLinkDatabase(ctx context.Context) *sql.DB {
 		os.Exit(1)
 	}
 
-	go func() {
-		ping := database.Ping()
-		if ping != nil {
-			os.Exit(2)
-		}
-	}()
-
 	return database
+}
+
+func FetchDatabaseData(ctx context.Context) ([]User, error) {
+	database := FetchDatabase(ctx)
+
+	rows, err := database.Query("SELECT * FROM users")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	// An album slice to hold data from returned rows.
+	var users []User
+
+	// Loop through rows, using Scan to assign column data to struct fields.
+	for rows.Next() {
+		var use User
+		if err := rows.Scan(&use.ID, &use.Name); err != nil {
+			return users, err
+		}
+		users = append(users, use)
+	}
+	if err = rows.Err(); err != nil {
+		return users, err
+	}
+	return users, nil
 }

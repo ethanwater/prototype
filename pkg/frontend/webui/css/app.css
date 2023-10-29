@@ -49,6 +49,36 @@ p {
   margin-left: 5px;
   margin-bottom: 20px;
 }
+#emojis {
+  color: #ff4a56;
+  border: 1pt solid black;
+  font-size: 1rem;
+  min-height: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.emoji {
+  padding: 0.4rem;
+  cursor: pointer;
+}
+
+#loader_box {
+  padding-top: 0.4rem;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
+}
+.loader {
+  width: 2rem;
+  height: 2rem;
+  border: 5px solid black;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
 .transition, form button, form .question label, form .question input[type="text"] {
     -moz-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
     -o-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);

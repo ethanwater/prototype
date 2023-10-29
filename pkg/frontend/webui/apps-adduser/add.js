@@ -73,6 +73,13 @@ function strip(s) {
     //  window.location.assign("index.html");
 		//}
 		echoApp.addEventListener('click', echoapp);
+
+    const fetchApp = document.getElementById('fetchApp');
+    const fetchapp = () => {
+      window.location.assign("../apps-fetch/index.html");
+    }
+    fetchApp.addEventListener('click', fetchapp);
+
 		//addApp.addEventListener('click', addapp);
     query.addEventListener('keypress', (e) => {
       if (e.key == 'Enter' && strip(query.value) != "") {

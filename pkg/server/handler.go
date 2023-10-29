@@ -51,3 +51,22 @@ func Add(ctx context.Context, app *Server) http.Handler {
 		}
 	})
 }
+
+func FetchUsers(ctx context.Context, app *Server) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		result, err := FetchDatabaseData(ctx)
+		if err != nil {
+			app.Logger(r.Context()).Error("cannot add user", "err", err)
+		}
+		bytes, err := json.Marshal(result)
+		if err != nil {
+			app.Logger(r.Context()).Error("error marshaling results", "err", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
+			app.Logger(r.Context()).Error("error writing search results", "err", err)
+		}
+
+	})
+}

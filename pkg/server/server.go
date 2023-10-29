@@ -45,6 +45,7 @@ func Deploy(ctx context.Context, app *Server) error {
 	go func() {
 		app.db_name = toml.Get("database.name").(string)
 		app.Database = EstablishLinkDatabase(ctx)
+		app.Logger(ctx).Debug("connected to database: ", "database", app.db_name)
 	}()
 
 	app.Logger(ctx).Info("vivian: app deployed", "address", app.listener)
@@ -53,6 +54,7 @@ func Deploy(ctx context.Context, app *Server) error {
 	appHandler.Handle("/kill", kill(ctx, app))
 	appHandler.Handle("/echo", Echo(ctx, app))
 	appHandler.Handle("/add", Add(ctx, app))
+	appHandler.Handle("/fetch", FetchUsers(ctx, app))
 	appHandler.HandleFunc(weaver.HealthzURL, weaver.HealthzHandler)
 
 	return http.Serve(app.listener, app.handler)

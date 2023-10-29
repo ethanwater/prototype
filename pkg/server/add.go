@@ -23,8 +23,8 @@ func (a *adduser) AddUser(ctx context.Context, query string) (string, error) {
 	logger := a.Logger(ctx)
 	mu.Lock()
 	defer mu.Unlock()
-	b := EstablishLinkDatabase(ctx)
-	result, err := b.Exec("INSERT INTO users (name) VALUES (?)", query)
+	db := FetchDatabase(ctx)
+	result, err := db.Exec("INSERT INTO users (name) VALUES (?)", query)
 	var status string
 	if err != nil {
 		status = addFailErr + query
