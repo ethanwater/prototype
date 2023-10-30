@@ -23,9 +23,22 @@ func (a *adduser) AddUser(ctx context.Context, query string) (string, error) {
 	logger := a.Logger(ctx)
 	mu.Lock()
 	defer mu.Unlock()
+
+	dbx, err := FetchDatabaseData(ctx)
+	if err != nil {
+		logger.Error("err:", err)
+	}
+
+	var status string
+	for _, user := range dbx {
+		if query == user.Name {
+			status = "user: '" + query + "' already exists"
+			return status, nil
+		}
+	}
+
 	db := FetchDatabase(ctx)
 	result, err := db.Exec("INSERT INTO users (name) VALUES (?)", query)
-	var status string
 	if err != nil {
 		status = addFailErr + query
 		logger.Debug(status, "err", err)
