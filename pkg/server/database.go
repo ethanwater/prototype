@@ -61,7 +61,7 @@ func FetchDatabaseData(ctx context.Context) ([]models.Account, error) {
 	// Loop through rows, using Scan to assign column data to struct fields.
 	for rows.Next() {
 		var acc models.Account
-		if err := rows.Scan(&acc.ID, &acc.Alias, &acc.Email, &acc.Password, &acc.Tier); err != nil {
+		if err := rows.Scan(&acc.ID, &acc.Alias, &acc.Name, &acc.Email, &acc.Password, &acc.Tier); err != nil {
 			return accounts, err
 		}
 		accounts = append(accounts, acc)
@@ -85,7 +85,7 @@ func FetchAccount(ctx context.Context, email string) (models.Account, error) {
 	var acc models.Account
 	// Loop through rows, using Scan to assign column data to struct fields.
 	for rows.Next() {
-		if err := rows.Scan(&acc.ID, &acc.Alias, &acc.Email, &acc.Password, &acc.Tier); err != nil {
+		if err := rows.Scan(&acc.ID, &acc.Alias, &acc.Name, &acc.Email, &acc.Password, &acc.Tier); err != nil {
 			return acc, err
 		}
 	}
@@ -93,5 +93,4 @@ func FetchAccount(ctx context.Context, email string) (models.Account, error) {
 		return acc, err
 	}
 	return acc, nil
-
 }
