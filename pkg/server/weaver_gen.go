@@ -15,38 +15,56 @@ import (
 
 func init() {
 	codegen.Register(codegen.Registration{
-		Name:  "vivian/pkg/server/AddUserInterface",
-		Iface: reflect.TypeOf((*AddUserInterface)(nil)).Elem(),
-		Impl:  reflect.TypeOf(adduser{}),
+		Name:  "vivian/pkg/server/Add",
+		Iface: reflect.TypeOf((*Add)(nil)).Elem(),
+		Impl:  reflect.TypeOf(add{}),
 		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
-			return addUserInterface_local_stub{impl: impl.(AddUserInterface), tracer: tracer, addUserMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/AddUserInterface", Method: "AddUser", Remote: false})}
+			return add_local_stub{impl: impl.(Add), tracer: tracer, databaseAddAccountMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/Add", Method: "DatabaseAddAccount", Remote: false})}
 		},
 		ClientStubFn: func(stub codegen.Stub, caller string) any {
-			return addUserInterface_client_stub{stub: stub, addUserMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/AddUserInterface", Method: "AddUser", Remote: true})}
+			return add_client_stub{stub: stub, databaseAddAccountMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/Add", Method: "DatabaseAddAccount", Remote: true})}
 		},
 		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
-			return addUserInterface_server_stub{impl: impl.(AddUserInterface), addLoad: addLoad}
+			return add_server_stub{impl: impl.(Add), addLoad: addLoad}
 		},
 		ReflectStubFn: func(caller func(string, context.Context, []any, []any) error) any {
-			return addUserInterface_reflect_stub{caller: caller}
+			return add_reflect_stub{caller: caller}
 		},
 		RefData: "",
 	})
 	codegen.Register(codegen.Registration{
-		Name:  "vivian/pkg/server/EchoInterface",
-		Iface: reflect.TypeOf((*EchoInterface)(nil)).Elem(),
+		Name:  "vivian/pkg/server/Echo",
+		Iface: reflect.TypeOf((*Echo)(nil)).Elem(),
 		Impl:  reflect.TypeOf(echo{}),
 		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
-			return echoInterface_local_stub{impl: impl.(EchoInterface), tracer: tracer, echoMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/EchoInterface", Method: "Echo", Remote: false})}
+			return echo_local_stub{impl: impl.(Echo), tracer: tracer, echoResponseMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/Echo", Method: "EchoResponse", Remote: false})}
 		},
 		ClientStubFn: func(stub codegen.Stub, caller string) any {
-			return echoInterface_client_stub{stub: stub, echoMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/EchoInterface", Method: "Echo", Remote: true})}
+			return echo_client_stub{stub: stub, echoResponseMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/Echo", Method: "EchoResponse", Remote: true})}
 		},
 		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
-			return echoInterface_server_stub{impl: impl.(EchoInterface), addLoad: addLoad}
+			return echo_server_stub{impl: impl.(Echo), addLoad: addLoad}
 		},
 		ReflectStubFn: func(caller func(string, context.Context, []any, []any) error) any {
-			return echoInterface_reflect_stub{caller: caller}
+			return echo_reflect_stub{caller: caller}
+		},
+		RefData: "",
+	})
+	codegen.Register(codegen.Registration{
+		Name:  "vivian/pkg/server/Login",
+		Iface: reflect.TypeOf((*Login)(nil)).Elem(),
+		Impl:  reflect.TypeOf(login{}),
+		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
+			return login_local_stub{impl: impl.(Login), tracer: tracer, loginMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/Login", Method: "Login", Remote: false})}
+		},
+		ClientStubFn: func(stub codegen.Stub, caller string) any {
+			return login_client_stub{stub: stub, loginMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivian/pkg/server/Login", Method: "Login", Remote: true})}
+		},
+		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
+			return login_server_stub{impl: impl.(Login), addLoad: addLoad}
+		},
+		ReflectStubFn: func(caller func(string, context.Context, []any, []any) error) any {
+			return login_reflect_stub{caller: caller}
 		},
 		RefData: "",
 	})
@@ -65,39 +83,41 @@ func init() {
 		ReflectStubFn: func(caller func(string, context.Context, []any, []any) error) any {
 			return main_reflect_stub{caller: caller}
 		},
-		RefData: "⟦f3828247:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→vivian/pkg/server/EchoInterface⟧\n⟦1bd294f1:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→vivian/pkg/server/AddUserInterface⟧\n⟦2f15269b:wEaVeRlIsTeNeRs:github.com/ServiceWeaver/weaver/Main→vivian⟧\n",
+		RefData: "⟦d2edcb68:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→vivian/pkg/server/Echo⟧\n⟦e5803fa6:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→vivian/pkg/server/Add⟧\n⟦8728d12f:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→vivian/pkg/server/Login⟧\n⟦2f15269b:wEaVeRlIsTeNeRs:github.com/ServiceWeaver/weaver/Main→vivian⟧\n",
 	})
 }
 
 // weaver.InstanceOf checks.
-var _ weaver.InstanceOf[AddUserInterface] = (*adduser)(nil)
-var _ weaver.InstanceOf[EchoInterface] = (*echo)(nil)
+var _ weaver.InstanceOf[Add] = (*add)(nil)
+var _ weaver.InstanceOf[Echo] = (*echo)(nil)
+var _ weaver.InstanceOf[Login] = (*login)(nil)
 var _ weaver.InstanceOf[weaver.Main] = (*Server)(nil)
 
 // weaver.Router checks.
-var _ weaver.Unrouted = (*adduser)(nil)
+var _ weaver.Unrouted = (*add)(nil)
 var _ weaver.Unrouted = (*echo)(nil)
+var _ weaver.Unrouted = (*login)(nil)
 var _ weaver.Unrouted = (*Server)(nil)
 
 // Local stub implementations.
 
-type addUserInterface_local_stub struct {
-	impl           AddUserInterface
-	tracer         trace.Tracer
-	addUserMetrics *codegen.MethodMetrics
+type add_local_stub struct {
+	impl                      Add
+	tracer                    trace.Tracer
+	databaseAddAccountMetrics *codegen.MethodMetrics
 }
 
-// Check that addUserInterface_local_stub implements the AddUserInterface interface.
-var _ AddUserInterface = (*addUserInterface_local_stub)(nil)
+// Check that add_local_stub implements the Add interface.
+var _ Add = (*add_local_stub)(nil)
 
-func (s addUserInterface_local_stub) AddUser(ctx context.Context, a0 string) (r0 string, err error) {
+func (s add_local_stub) DatabaseAddAccount(ctx context.Context, a0 string) (r0 string, err error) {
 	// Update metrics.
-	begin := s.addUserMetrics.Begin()
-	defer func() { s.addUserMetrics.End(begin, err != nil, 0, 0) }()
+	begin := s.databaseAddAccountMetrics.Begin()
+	defer func() { s.databaseAddAccountMetrics.End(begin, err != nil, 0, 0) }()
 	span := trace.SpanFromContext(ctx)
 	if span.SpanContext().IsValid() {
 		// Create a child span for this method.
-		ctx, span = s.tracer.Start(ctx, "server.AddUserInterface.AddUser", trace.WithSpanKind(trace.SpanKindInternal))
+		ctx, span = s.tracer.Start(ctx, "server.Add.DatabaseAddAccount", trace.WithSpanKind(trace.SpanKindInternal))
 		defer func() {
 			if err != nil {
 				span.RecordError(err)
@@ -107,26 +127,26 @@ func (s addUserInterface_local_stub) AddUser(ctx context.Context, a0 string) (r0
 		}()
 	}
 
-	return s.impl.AddUser(ctx, a0)
+	return s.impl.DatabaseAddAccount(ctx, a0)
 }
 
-type echoInterface_local_stub struct {
-	impl        EchoInterface
-	tracer      trace.Tracer
-	echoMetrics *codegen.MethodMetrics
+type echo_local_stub struct {
+	impl                Echo
+	tracer              trace.Tracer
+	echoResponseMetrics *codegen.MethodMetrics
 }
 
-// Check that echoInterface_local_stub implements the EchoInterface interface.
-var _ EchoInterface = (*echoInterface_local_stub)(nil)
+// Check that echo_local_stub implements the Echo interface.
+var _ Echo = (*echo_local_stub)(nil)
 
-func (s echoInterface_local_stub) Echo(ctx context.Context, a0 string) (err error) {
+func (s echo_local_stub) EchoResponse(ctx context.Context, a0 string) (err error) {
 	// Update metrics.
-	begin := s.echoMetrics.Begin()
-	defer func() { s.echoMetrics.End(begin, err != nil, 0, 0) }()
+	begin := s.echoResponseMetrics.Begin()
+	defer func() { s.echoResponseMetrics.End(begin, err != nil, 0, 0) }()
 	span := trace.SpanFromContext(ctx)
 	if span.SpanContext().IsValid() {
 		// Create a child span for this method.
-		ctx, span = s.tracer.Start(ctx, "server.EchoInterface.Echo", trace.WithSpanKind(trace.SpanKindInternal))
+		ctx, span = s.tracer.Start(ctx, "server.Echo.EchoResponse", trace.WithSpanKind(trace.SpanKindInternal))
 		defer func() {
 			if err != nil {
 				span.RecordError(err)
@@ -136,7 +156,36 @@ func (s echoInterface_local_stub) Echo(ctx context.Context, a0 string) (err erro
 		}()
 	}
 
-	return s.impl.Echo(ctx, a0)
+	return s.impl.EchoResponse(ctx, a0)
+}
+
+type login_local_stub struct {
+	impl         Login
+	tracer       trace.Tracer
+	loginMetrics *codegen.MethodMetrics
+}
+
+// Check that login_local_stub implements the Login interface.
+var _ Login = (*login_local_stub)(nil)
+
+func (s login_local_stub) Login(ctx context.Context, a0 string, a1 string) (r0 bool, err error) {
+	// Update metrics.
+	begin := s.loginMetrics.Begin()
+	defer func() { s.loginMetrics.End(begin, err != nil, 0, 0) }()
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.tracer.Start(ctx, "server.Login.Login", trace.WithSpanKind(trace.SpanKindInternal))
+		defer func() {
+			if err != nil {
+				span.RecordError(err)
+				span.SetStatus(codes.Error, err.Error())
+			}
+			span.End()
+		}()
+	}
+
+	return s.impl.Login(ctx, a0, a1)
 }
 
 type main_local_stub struct {
@@ -149,24 +198,24 @@ var _ weaver.Main = (*main_local_stub)(nil)
 
 // Client stub implementations.
 
-type addUserInterface_client_stub struct {
-	stub           codegen.Stub
-	addUserMetrics *codegen.MethodMetrics
+type add_client_stub struct {
+	stub                      codegen.Stub
+	databaseAddAccountMetrics *codegen.MethodMetrics
 }
 
-// Check that addUserInterface_client_stub implements the AddUserInterface interface.
-var _ AddUserInterface = (*addUserInterface_client_stub)(nil)
+// Check that add_client_stub implements the Add interface.
+var _ Add = (*add_client_stub)(nil)
 
-func (s addUserInterface_client_stub) AddUser(ctx context.Context, a0 string) (r0 string, err error) {
+func (s add_client_stub) DatabaseAddAccount(ctx context.Context, a0 string) (r0 string, err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
-	begin := s.addUserMetrics.Begin()
-	defer func() { s.addUserMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
+	begin := s.databaseAddAccountMetrics.Begin()
+	defer func() { s.databaseAddAccountMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
 
 	span := trace.SpanFromContext(ctx)
 	if span.SpanContext().IsValid() {
 		// Create a child span for this method.
-		ctx, span = s.stub.Tracer().Start(ctx, "server.AddUserInterface.AddUser", trace.WithSpanKind(trace.SpanKindClient))
+		ctx, span = s.stub.Tracer().Start(ctx, "server.Add.DatabaseAddAccount", trace.WithSpanKind(trace.SpanKindClient))
 	}
 
 	defer func() {
@@ -213,24 +262,24 @@ func (s addUserInterface_client_stub) AddUser(ctx context.Context, a0 string) (r
 	return
 }
 
-type echoInterface_client_stub struct {
-	stub        codegen.Stub
-	echoMetrics *codegen.MethodMetrics
+type echo_client_stub struct {
+	stub                codegen.Stub
+	echoResponseMetrics *codegen.MethodMetrics
 }
 
-// Check that echoInterface_client_stub implements the EchoInterface interface.
-var _ EchoInterface = (*echoInterface_client_stub)(nil)
+// Check that echo_client_stub implements the Echo interface.
+var _ Echo = (*echo_client_stub)(nil)
 
-func (s echoInterface_client_stub) Echo(ctx context.Context, a0 string) (err error) {
+func (s echo_client_stub) EchoResponse(ctx context.Context, a0 string) (err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
-	begin := s.echoMetrics.Begin()
-	defer func() { s.echoMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
+	begin := s.echoResponseMetrics.Begin()
+	defer func() { s.echoResponseMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
 
 	span := trace.SpanFromContext(ctx)
 	if span.SpanContext().IsValid() {
 		// Create a child span for this method.
-		ctx, span = s.stub.Tracer().Start(ctx, "server.EchoInterface.Echo", trace.WithSpanKind(trace.SpanKindClient))
+		ctx, span = s.stub.Tracer().Start(ctx, "server.Echo.EchoResponse", trace.WithSpanKind(trace.SpanKindClient))
 	}
 
 	defer func() {
@@ -276,6 +325,72 @@ func (s echoInterface_client_stub) Echo(ctx context.Context, a0 string) (err err
 	return
 }
 
+type login_client_stub struct {
+	stub         codegen.Stub
+	loginMetrics *codegen.MethodMetrics
+}
+
+// Check that login_client_stub implements the Login interface.
+var _ Login = (*login_client_stub)(nil)
+
+func (s login_client_stub) Login(ctx context.Context, a0 string, a1 string) (r0 bool, err error) {
+	// Update metrics.
+	var requestBytes, replyBytes int
+	begin := s.loginMetrics.Begin()
+	defer func() { s.loginMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
+
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.stub.Tracer().Start(ctx, "server.Login.Login", trace.WithSpanKind(trace.SpanKindClient))
+	}
+
+	defer func() {
+		// Catch and return any panics detected during encoding/decoding/rpc.
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+			if err != nil {
+				err = errors.Join(weaver.RemoteCallError, err)
+			}
+		}
+
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+		}
+		span.End()
+
+	}()
+
+	// Preallocate a buffer of the right size.
+	size := 0
+	size += (4 + len(a0))
+	size += (4 + len(a1))
+	enc := codegen.NewEncoder()
+	enc.Reset(size)
+
+	// Encode arguments.
+	enc.String(a0)
+	enc.String(a1)
+	var shardKey uint64
+
+	// Call the remote method.
+	requestBytes = len(enc.Data())
+	var results []byte
+	results, err = s.stub.Run(ctx, 0, enc.Data(), shardKey)
+	replyBytes = len(results)
+	if err != nil {
+		err = errors.Join(weaver.RemoteCallError, err)
+		return
+	}
+
+	// Decode the results.
+	dec := codegen.NewDecoder(results)
+	r0 = dec.Bool()
+	err = dec.Error()
+	return
+}
+
 type main_client_stub struct {
 	stub codegen.Stub
 }
@@ -308,25 +423,25 @@ please file an issue at https://github.com/ServiceWeaver/weaver/issues.
 
 // Server stub implementations.
 
-type addUserInterface_server_stub struct {
-	impl    AddUserInterface
+type add_server_stub struct {
+	impl    Add
 	addLoad func(key uint64, load float64)
 }
 
-// Check that addUserInterface_server_stub implements the codegen.Server interface.
-var _ codegen.Server = (*addUserInterface_server_stub)(nil)
+// Check that add_server_stub implements the codegen.Server interface.
+var _ codegen.Server = (*add_server_stub)(nil)
 
 // GetStubFn implements the codegen.Server interface.
-func (s addUserInterface_server_stub) GetStubFn(method string) func(ctx context.Context, args []byte) ([]byte, error) {
+func (s add_server_stub) GetStubFn(method string) func(ctx context.Context, args []byte) ([]byte, error) {
 	switch method {
-	case "AddUser":
-		return s.addUser
+	case "DatabaseAddAccount":
+		return s.databaseAddAccount
 	default:
 		return nil
 	}
 }
 
-func (s addUserInterface_server_stub) addUser(ctx context.Context, args []byte) (res []byte, err error) {
+func (s add_server_stub) databaseAddAccount(ctx context.Context, args []byte) (res []byte, err error) {
 	// Catch and return any panics detected during encoding/decoding/rpc.
 	defer func() {
 		if err == nil {
@@ -342,7 +457,7 @@ func (s addUserInterface_server_stub) addUser(ctx context.Context, args []byte) 
 	// TODO(rgrandl): The deferred function above will recover from panics in the
 	// user code: fix this.
 	// Call the local method.
-	r0, appErr := s.impl.AddUser(ctx, a0)
+	r0, appErr := s.impl.DatabaseAddAccount(ctx, a0)
 
 	// Encode the results.
 	enc := codegen.NewEncoder()
@@ -351,25 +466,25 @@ func (s addUserInterface_server_stub) addUser(ctx context.Context, args []byte) 
 	return enc.Data(), nil
 }
 
-type echoInterface_server_stub struct {
-	impl    EchoInterface
+type echo_server_stub struct {
+	impl    Echo
 	addLoad func(key uint64, load float64)
 }
 
-// Check that echoInterface_server_stub implements the codegen.Server interface.
-var _ codegen.Server = (*echoInterface_server_stub)(nil)
+// Check that echo_server_stub implements the codegen.Server interface.
+var _ codegen.Server = (*echo_server_stub)(nil)
 
 // GetStubFn implements the codegen.Server interface.
-func (s echoInterface_server_stub) GetStubFn(method string) func(ctx context.Context, args []byte) ([]byte, error) {
+func (s echo_server_stub) GetStubFn(method string) func(ctx context.Context, args []byte) ([]byte, error) {
 	switch method {
-	case "Echo":
-		return s.echo
+	case "EchoResponse":
+		return s.echoResponse
 	default:
 		return nil
 	}
 }
 
-func (s echoInterface_server_stub) echo(ctx context.Context, args []byte) (res []byte, err error) {
+func (s echo_server_stub) echoResponse(ctx context.Context, args []byte) (res []byte, err error) {
 	// Catch and return any panics detected during encoding/decoding/rpc.
 	defer func() {
 		if err == nil {
@@ -385,10 +500,55 @@ func (s echoInterface_server_stub) echo(ctx context.Context, args []byte) (res [
 	// TODO(rgrandl): The deferred function above will recover from panics in the
 	// user code: fix this.
 	// Call the local method.
-	appErr := s.impl.Echo(ctx, a0)
+	appErr := s.impl.EchoResponse(ctx, a0)
 
 	// Encode the results.
 	enc := codegen.NewEncoder()
+	enc.Error(appErr)
+	return enc.Data(), nil
+}
+
+type login_server_stub struct {
+	impl    Login
+	addLoad func(key uint64, load float64)
+}
+
+// Check that login_server_stub implements the codegen.Server interface.
+var _ codegen.Server = (*login_server_stub)(nil)
+
+// GetStubFn implements the codegen.Server interface.
+func (s login_server_stub) GetStubFn(method string) func(ctx context.Context, args []byte) ([]byte, error) {
+	switch method {
+	case "Login":
+		return s.login
+	default:
+		return nil
+	}
+}
+
+func (s login_server_stub) login(ctx context.Context, args []byte) (res []byte, err error) {
+	// Catch and return any panics detected during encoding/decoding/rpc.
+	defer func() {
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+		}
+	}()
+
+	// Decode arguments.
+	dec := codegen.NewDecoder(args)
+	var a0 string
+	a0 = dec.String()
+	var a1 string
+	a1 = dec.String()
+
+	// TODO(rgrandl): The deferred function above will recover from panics in the
+	// user code: fix this.
+	// Call the local method.
+	r0, appErr := s.impl.Login(ctx, a0, a1)
+
+	// Encode the results.
+	enc := codegen.NewEncoder()
+	enc.Bool(r0)
 	enc.Error(appErr)
 	return enc.Data(), nil
 }
@@ -411,27 +571,39 @@ func (s main_server_stub) GetStubFn(method string) func(ctx context.Context, arg
 
 // Reflect stub implementations.
 
-type addUserInterface_reflect_stub struct {
+type add_reflect_stub struct {
 	caller func(string, context.Context, []any, []any) error
 }
 
-// Check that addUserInterface_reflect_stub implements the AddUserInterface interface.
-var _ AddUserInterface = (*addUserInterface_reflect_stub)(nil)
+// Check that add_reflect_stub implements the Add interface.
+var _ Add = (*add_reflect_stub)(nil)
 
-func (s addUserInterface_reflect_stub) AddUser(ctx context.Context, a0 string) (r0 string, err error) {
-	err = s.caller("AddUser", ctx, []any{a0}, []any{&r0})
+func (s add_reflect_stub) DatabaseAddAccount(ctx context.Context, a0 string) (r0 string, err error) {
+	err = s.caller("DatabaseAddAccount", ctx, []any{a0}, []any{&r0})
 	return
 }
 
-type echoInterface_reflect_stub struct {
+type echo_reflect_stub struct {
 	caller func(string, context.Context, []any, []any) error
 }
 
-// Check that echoInterface_reflect_stub implements the EchoInterface interface.
-var _ EchoInterface = (*echoInterface_reflect_stub)(nil)
+// Check that echo_reflect_stub implements the Echo interface.
+var _ Echo = (*echo_reflect_stub)(nil)
 
-func (s echoInterface_reflect_stub) Echo(ctx context.Context, a0 string) (err error) {
-	err = s.caller("Echo", ctx, []any{a0}, []any{})
+func (s echo_reflect_stub) EchoResponse(ctx context.Context, a0 string) (err error) {
+	err = s.caller("EchoResponse", ctx, []any{a0}, []any{})
+	return
+}
+
+type login_reflect_stub struct {
+	caller func(string, context.Context, []any, []any) error
+}
+
+// Check that login_reflect_stub implements the Login interface.
+var _ Login = (*login_reflect_stub)(nil)
+
+func (s login_reflect_stub) Login(ctx context.Context, a0 string, a1 string) (r0 bool, err error) {
+	err = s.caller("Login", ctx, []any{a0, a1}, []any{&r0})
 	return
 }
 

@@ -5,15 +5,11 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"vivian/pkg/auth/models"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/pelletier/go-toml"
 )
-
-type User struct {
-	ID   int
-	Name string
-}
 
 func EstablishLinkDatabase(ctx context.Context) *sql.DB {
 	database := FetchDatabase(ctx)
@@ -50,7 +46,7 @@ func FetchDatabase(ctx context.Context) *sql.DB {
 	return database
 }
 
-func FetchDatabaseData(ctx context.Context) ([]User, error) {
+func FetchDatabaseData(ctx context.Context) ([]models.Account, error) {
 	database := FetchDatabase(ctx)
 
 	rows, err := database.Query("SELECT * FROM users")
@@ -60,18 +56,42 @@ func FetchDatabaseData(ctx context.Context) ([]User, error) {
 	defer rows.Close()
 
 	// An album slice to hold data from returned rows.
-	var users []User
+	var accounts []models.Account
 
 	// Loop through rows, using Scan to assign column data to struct fields.
 	for rows.Next() {
-		var use User
-		if err := rows.Scan(&use.ID, &use.Name); err != nil {
-			return users, err
+		var acc models.Account
+		if err := rows.Scan(&acc.ID, &acc.Alias, &acc.Email, &acc.Password, &acc.Tier); err != nil {
+			return accounts, err
 		}
-		users = append(users, use)
+		accounts = append(accounts, acc)
 	}
 	if err = rows.Err(); err != nil {
-		return users, err
+		return accounts, err
 	}
-	return users, nil
+	return accounts, nil
+}
+
+func FetchAccount(ctx context.Context, email string) (models.Account, error) {
+	database := FetchDatabase(ctx)
+
+	rows, err := database.Query("SELECT * FROM users WHERE email = ?", email)
+	if err != nil {
+		fmt.Println("nope")
+	}
+	defer rows.Close()
+
+	// An album slice to hold data from returned rows.
+	var acc models.Account
+	// Loop through rows, using Scan to assign column data to struct fields.
+	for rows.Next() {
+		if err := rows.Scan(&acc.ID, &acc.Alias, &acc.Email, &acc.Password, &acc.Tier); err != nil {
+			return acc, err
+		}
+	}
+	if err = rows.Err(); err != nil {
+		return acc, err
+	}
+	return acc, nil
+
 }

@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"os"
 	"sync"
-	"vivian/pkg/frontend"
+	"vivian/pkg/web"
 
 	"log"
 	"net/http"
@@ -19,8 +19,9 @@ const Timeout = 10 * time.Second
 
 type Server struct {
 	weaver.Implements[weaver.Main]
-	echo     weaver.Ref[EchoInterface]
-	add      weaver.Ref[AddUserInterface]
+	echo     weaver.Ref[Echo]
+	add      weaver.Ref[Add]
+	login    weaver.Ref[Login]
 	listener weaver.Listener `weaver:"vivian"`
 
 	read_timeout  time.Duration
@@ -45,16 +46,17 @@ func Deploy(ctx context.Context, app *Server) error {
 	go func() {
 		app.db_name = toml.Get("database.name").(string)
 		app.Database = EstablishLinkDatabase(ctx)
-		app.Logger(ctx).Debug("connected to database: ", "database", app.db_name)
+		app.Logger(ctx).Debug("vivian: CONNECTED database: ", "database", app.db_name)
 	}()
 
-	app.Logger(ctx).Info("vivian: app deployed", "address", app.listener)
+	app.Logger(ctx).Info("vivian: APP DEPLOYED", "address", app.listener)
 
-	appHandler.Handle("/", http.StripPrefix("/", http.FileServer(http.FS(frontend.WebUI))))
+	appHandler.Handle("/", http.StripPrefix("/", http.FileServer(http.FS(web.WebUI))))
 	appHandler.Handle("/kill", kill(ctx, app))
-	appHandler.Handle("/echo", Echo(ctx, app))
-	appHandler.Handle("/add", Add(ctx, app))
+	appHandler.Handle("/echo", EchoResponse(ctx, app))
+	appHandler.Handle("/add", AddAccount(ctx, app))
 	appHandler.Handle("/fetch", FetchUsers(ctx, app))
+	appHandler.Handle("/login", AccountLogin(ctx, app))
 	appHandler.HandleFunc(weaver.HealthzURL, weaver.HealthzHandler)
 
 	return http.Serve(app.listener, app.handler)

@@ -9,5 +9,5 @@ binary = "vivian"
 listeners.vivian = {address = "localhost:9000"}
 
 [database]
-name = "user_queries"
+name = "vivian_users"
 address = "127.0.0.1:3306"
