@@ -11,7 +11,11 @@ import (
 var echoFailErr = "vivian: ERROR!"
 var addFailErr = "vivian: ERROR!"
 
-func EchoResponse(ctx context.Context, app *Server) http.Handler {
+func Split(r rune) bool {
+	return r == '&' || r == ','
+}
+
+func EchoResponse(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		query := strings.TrimSpace(r.URL.Query().Get("q"))
 		err := app.echo.Get().EchoResponse(ctx, query)
@@ -32,27 +36,27 @@ func EchoResponse(ctx context.Context, app *Server) http.Handler {
 	})
 }
 
-func AddAccount(ctx context.Context, app *Server) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		query := strings.TrimSpace(r.URL.Query().Get("q"))
-		result, err := app.add.Get().DatabaseAddAccount(ctx, query)
-		if err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR! cannot add user", "err", err)
-		}
+//func AddAccount(ctx context.Context, app *App) http.Handler {
+//	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//		query := strings.TrimSpace(r.URL.Query().Get("q"))
+//		result, err := app.add.Get().DatabaseAddAccount(ctx, query)
+//		if err != nil {
+//			app.Logger(r.Context()).Error("vivian: ERROR! cannot add user", "err", err)
+//		}
+//
+//		bytes, err := json.Marshal(result)
+//		if err != nil {
+//			app.Logger(r.Context()).Error("vivian: ERROR! failure marshalling results", "err", err)
+//			http.Error(w, err.Error(), http.StatusInternalServerError)
+//			return
+//		}
+//		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
+//			app.Logger(r.Context()).Error("vivian: ERROR! failure writing search results", "err", err)
+//		}
+//	})
+//}
 
-		bytes, err := json.Marshal(result)
-		if err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR! failure marshalling results", "err", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR! failure writing search results", "err", err)
-		}
-	})
-}
-
-func FetchUsers(ctx context.Context, app *Server) http.Handler {
+func FetchUsers(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		result, err := FetchDatabaseData(ctx)
 		if err != nil {
@@ -71,11 +75,7 @@ func FetchUsers(ctx context.Context, app *Server) http.Handler {
 	})
 }
 
-func Split(r rune) bool {
-	return r == '&' || r == ','
-}
-
-func AccountLogin(ctx context.Context, app *Server) http.Handler {
+func AccountLogin(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var result bool
 		query := strings.TrimSpace(r.URL.RawQuery)

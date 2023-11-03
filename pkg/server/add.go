@@ -8,6 +8,7 @@ import (
 	"github.com/ServiceWeaver/weaver/metrics"
 )
 
+// deprecated
 var database_add_user = metrics.NewCounter("USER added", "values addded to database")
 var mu sync.Mutex
 

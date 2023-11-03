@@ -94,3 +94,26 @@ func FetchAccount(ctx context.Context, email string) (models.Account, error) {
 	}
 	return acc, nil
 }
+
+func FetchAccountID(ctx context.Context, id int) (models.Account, error) {
+	database := FetchDatabase(ctx)
+
+	rows, err := database.Query("SELECT * FROM users WHERE id = ?", id)
+	if err != nil {
+		fmt.Println("nope")
+	}
+	defer rows.Close()
+
+	// An album slice to hold data from returned rows.
+	var acc models.Account
+	// Loop through rows, using Scan to assign column data to struct fields.
+	for rows.Next() {
+		if err := rows.Scan(&acc.ID, &acc.Alias, &acc.Name, &acc.Email, &acc.Password, &acc.Tier); err != nil {
+			return acc, err
+		}
+	}
+	if err = rows.Err(); err != nil {
+		return acc, err
+	}
+	return acc, nil
+}
