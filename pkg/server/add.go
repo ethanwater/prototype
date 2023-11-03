@@ -11,15 +11,15 @@ import (
 var database_add_user = metrics.NewCounter("USER added", "values addded to database")
 var mu sync.Mutex
 
-type AddUserInterface interface {
-	AddUser(context.Context, string) (string, error)
+type Add interface {
+	DatabaseAddAccount(context.Context, string) (string, error)
 }
 
-type adduser struct {
-	weaver.Implements[AddUserInterface]
+type add struct {
+	weaver.Implements[Add]
 }
 
-func (a *adduser) AddUser(ctx context.Context, query string) (string, error) {
+func (a *add) DatabaseAddAccount(ctx context.Context, query string) (string, error) {
 	logger := a.Logger(ctx)
 	mu.Lock()
 	defer mu.Unlock()
@@ -31,7 +31,7 @@ func (a *adduser) AddUser(ctx context.Context, query string) (string, error) {
 
 	var status string
 	for _, user := range dbx {
-		if query == user.Name {
+		if query == user.Alias {
 			status = "user: '" + query + "' already exists"
 			return status, nil
 		}
