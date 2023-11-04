@@ -1,13 +1,17 @@
 [vivian]
-version = "alpha v1.0.0"
-port = ":9000"
+version = "alpha v2.0.1"
 
 [serviceweaver]
 binary = "vivian"
 
-[multi]
+[single]
 listeners.vivian = {address = "localhost:9000"}
+
+[gke]
+regions = ["us-east1"]
+listeners.vivian = {public_hostname = "vivian.com"}
 
 [database]
 name = "vivian_users"
 address = "127.0.0.1:3306"
+
