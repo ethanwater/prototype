@@ -1,3 +1,5 @@
+import {strip} from "../apps-echo/echo"
+
 async function loginResponse(endpoint, query, aborter) {
     const response = await fetch(`/${endpoint}?${query}`, {signal: aborter});
     const text = await response.text();
@@ -6,15 +8,18 @@ async function loginResponse(endpoint, query, aborter) {
     } else {
       throw new Error(text);
     }
-  }
-
+}
 
 function main() {
-    const enterButton = document.getElementById('enter');
-    const email = document.getElementById('email');
-		email.value = localStorage.getItem('email');
-    const pass = document.getElementById('pass');
-    const attempts = document.getElementById('atp');
+    var email = (<HTMLInputElement>document.getElementById('email'));
+    const host = localStorage.getItem('email');
+    if (host != null) {
+      email.value = host;
+    }
+
+    var enterButton = (<HTMLInputElement>document.getElementById('enter'));
+    var pass = (<HTMLInputElement>document.getElementById('pass'));
+    var attempts = (<HTMLInputElement>document.getElementById('atp'));
     var loginAttempts = 0
   
     const inputs = document.querySelectorAll('input');
@@ -23,7 +28,7 @@ function main() {
       input.setAttribute('autocomplete', 'off')
       input.setAttribute('autocorrect', 'off')
       input.setAttribute('autocapitalize', 'off')
-      input.setAttribute('spellcheck', false)
+      input.setAttribute('spellcheck', 'off')
     })
   
     let controller; 
@@ -47,22 +52,23 @@ function main() {
 						localStorage.setItem("email", email.value)
             window.location.assign("../apps-echo/index.html");
           }
-        }).finally(() => {
-          pending--;
-          if (pending == 0) {
-          }
         });
       }
     }
 
+		document.addEventListener('keypress', (p) => {
+			if (p.key == 'Enter') {
+				login();
+			}
+		});
+  
     email.addEventListener('input', (e) => {
-      if (strip(email.value) != ""  & strip(pass.value)!="") {
+      if (strip(email.value) != "" && strip(pass.value)!="") {
         enterButton.disabled = false;
       } else {
         enterButton.disabled = true;
       }
     });
-    
 
     enterButton.addEventListener('click', login);
   }

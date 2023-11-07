@@ -16,7 +16,6 @@ a {
 }
 
 p {
-    left: 51%;
     position: relative;
     margin: auto;
     margin-top: 20px;
@@ -35,15 +34,15 @@ p {
 
 
 #atp {
-  left: 49%;
   font-size: small;
 }
 
 
 .container {
+		text-align: center;
     top: 20%;
     width: 100%;
-		position:fixed;
+		position: fixed;
 }
 
 .transition, form button, form .question label, form .question input[type="text"] {
@@ -55,13 +54,10 @@ p {
 
 
 button {
-  left: 50%;
   background-color: white;
   border: 1px solid #ff4a56;
   line-height: 0;
-  font-size: 17px;
-  display: inline-block;
-  box-sizing: border-box;
+  font-size: 15px;
   padding: 20px 15px;
   border-radius: 60px;
   color: #ff4a56;
@@ -76,28 +72,21 @@ button:hover, form button:focus {
   background-color: #ff4a56;
 }
 
-  
-
-
 input[type="text"] {
-  left: 40%;
-  top: 40%;
+	left: 36.5%;
   position: relative;
   margin-bottom: 20px;
-  appearance: none;
   background-color: #ff4a5e;
   border: 1px solid #ff4a56;
   line-height: 0;
   font-size: 17px;
   width: 25%;
-  display: block;
-  box-sizing: border-box;
+	display: block;
   padding: 10px 15px;
   border-radius: 60px;
   color: white;
   font-weight: 100;
   letter-spacing: 0.01em;
-  z-index: 1;
 }
 
  input[type="text"]:focus {

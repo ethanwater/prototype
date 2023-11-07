@@ -29,6 +29,7 @@ function main() {
   
   let controller; 
   let pending = 0; 
+
   const displayed = new Set(); 
   const fetch = () => {
     if (controller != undefined) {
@@ -67,14 +68,7 @@ function main() {
     }
   }
 
-  const addApp = document.getElementById('addApp');
   const echoApp = document.getElementById('echoApp');
-  
-  const addapp = () => {
-    window.location.assign("../apps-adduser/index.html");
-  }
-  addApp.addEventListener('click', addapp);
-  
   const echoapp = () => {
     window.location.assign("../apps-echo/index.html");
   }

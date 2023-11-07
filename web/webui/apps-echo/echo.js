@@ -1,4 +1,5 @@
-function strip(s) {
+
+export function strip(s) {
   return s.replace(/\s+/g, '');
 }
 
@@ -68,20 +69,11 @@ function main() {
 
   //optimize these last two elements later, remove need to repeat
   //const echoApp = document.getElementById('echoApp');
-  const addApp = document.getElementById('addApp');
   const fetchApp = document.getElementById('fetchApp');
-
-  const addapp = () => {
-    window.location.assign("../apps-adduser/index.html");
-  }
-  addApp.addEventListener('click', addapp);
-
   const fetchapp = () => {
     window.location.assign("../apps-fetch/index.html");
   }
   fetchApp.addEventListener('click', fetchapp);
-
-
 
   query.addEventListener('keypress', (e) => {
     if (e.key == 'Enter' && strip(query.value) != "") {

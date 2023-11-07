@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS users;
 CREATE TABLE users(
-  id         INT UNIQUE,
+  id         INT UNIQUE NOT NULL,
   alias      VARCHAR(128) NOT NULL UNIQUE,
   name       VARCHAR(128) NOT NULL,
   email      VARCHAR(128) UNIQUE,

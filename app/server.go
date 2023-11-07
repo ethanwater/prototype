@@ -57,5 +57,8 @@ func Deploy(ctx context.Context, app *App) error {
 	appHandler.Handle("/login", weaver.InstrumentHandler("login", AccountLogin(ctx, app)))
 	appHandler.HandleFunc(weaver.HealthzURL, weaver.HealthzHandler)
 
+
+	
+	//return http.Serve(app.listener, app.handler)
 	return http.ServeTLS(app.listener, app.handler, "certificates/server.crt", "certificates/server.key")
 }
