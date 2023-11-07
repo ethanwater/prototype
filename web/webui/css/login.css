@@ -5,9 +5,9 @@ html, body {
 }
 
 body {
-    font-family: Helvetica, sans-serif;
-    font-weight: light;
-    -webkit-font-smoothing: antialiased;
+  font-family: Helvetica, sans-serif;
+  font-weight: light;
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
@@ -16,14 +16,14 @@ a {
 }
 
 p {
-    position: relative;
-    margin: auto;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    color: #ff4a56;
-    font-family: Helvetica, sans-serif;
-    font-weight: light;
-    -webkit-font-smoothing: antialiased;
+  position: relative;
+  margin: auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  color: #ff4a56;
+  font-family: Helvetica, sans-serif;
+  font-weight: light;
+  -webkit-font-smoothing: antialiased;
 }
 
 * {
@@ -32,26 +32,23 @@ p {
   -webkit-font-smoothing: antialiased;
 }
 
-
 #atp {
   font-size: small;
 }
 
-
 .container {
-		text-align: center;
-    top: 20%;
-    width: 100%;
-		position: fixed;
+	text-align: center;
+  top: 20%;
+  width: 100%;
+	position: fixed;
 }
 
 .transition, form button, form .question label, form .question input[type="text"] {
-    -moz-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
-    -o-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
-    -webkit-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
-    transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
+  -moz-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
+  -o-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
+  -webkit-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
+  transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
 }
-
 
 button {
   background-color: white;
@@ -87,12 +84,14 @@ input[type="text"] {
   color: white;
   font-weight: 100;
   letter-spacing: 0.01em;
+  
 }
 
- input[type="text"]:focus {
+input[type="text"]:focus {
   outline: none;
   background: white;
   color: #ff4a5e;
+  
 }
 
 input[type="text"]:focus ~ label {
@@ -109,5 +108,30 @@ input[type="text"]:valid ~ label {
   -ms-transform: translate(5px, -35px) scale(0.6);
   -webkit-transform: translate(5px, -35px) scale(0.6);
   transform: translate(5px, -35px) scale(0.6);
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  } 
+}
+
+.incorrect {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px; 
 }
   

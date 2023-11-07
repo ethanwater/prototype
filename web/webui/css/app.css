@@ -35,10 +35,10 @@ p {
 }
 
 #container {
-		display: inline-block;
-		position: relative;
-    color: black;
-		width: 20%;
+	display: inline-block;
+	position: relative;
+  color: black;
+	width: 20%;
 }
 
 #host {
@@ -81,10 +81,10 @@ p {
 }
 
 .transition, form button, form .question label, form .question input[type="text"] {
-    -moz-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
-    -o-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
-    -webkit-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
-    transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
+  -moz-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
+  -o-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
+  -webkit-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
+  transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
 }
 
 .app {
@@ -97,7 +97,7 @@ p {
 
 .field_interface {
   display: inline-block;
-  height: 99%; /*change to 100% later*/
+  height: 99%; 
   width: 20%;
   height: 99%;
 }
@@ -169,7 +169,6 @@ button:hover, form button:focus {
   background-color: #ff4a56;
 }
 
-  
 form {
   position: relative;
   display: inline-block;
