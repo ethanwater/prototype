@@ -41,11 +41,11 @@ function main() {
             const results = JSON.parse(v);
             if (results == null || results == false ) {
                 loginAttempts ++;
-                attempts.innerText = "attempts left: " + (3 - loginAttempts);
-                if (loginAttempts == 3) {
-                    attempts.innerText = "locked";
-                    enterButton.disabled = true;
-                }
+                //attempts.innerText = "attempts left: " + (3 - loginAttempts);
+                //if (loginAttempts == 3) {
+                //    attempts.innerText = "locked";
+                //    enterButton.disabled = true;
+                //}
                 passquery.classList.add("incorrect");
                 emailquery.classList.add("incorrect");
 
