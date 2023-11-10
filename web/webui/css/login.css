@@ -1,10 +1,11 @@
 :root {
   --space-maroon: #9b111e;
   --space-whey: white;
-  --space-red: #ff4a56;
+  --space-red: #dc143c;
 }
 
 html, body {
+  height: 100%;
   max-width: 100%;
   overflow-x: hidden;
   overflow-y: hidden;
@@ -15,6 +16,7 @@ body {
   font-family: Helvetica, sans-serif;
   font-weight: light;
   -webkit-font-smoothing: antialiased;
+  
 }
 
 a {
@@ -46,6 +48,12 @@ p {
   -webkit-font-smoothing: antialiased;
 
   font-size: small;
+}
+
+#mark {
+  animation: enter 3s;
+  font-size: 4%;
+  color: lightcoral;
 }
 
 .container {
@@ -85,15 +93,15 @@ button:hover, form button:focus {
 }
 
 input[type="text"] {
-	box-shadow: 0 6px 9px -2px lightpink;
-	left: 36.5%;
+	box-shadow: 0 6px 9px -2px rgb(252, 142, 159);
+	left: 38.7%;
   position: relative;
   margin-bottom: 20px;
   background-color: var(--space-whey);
   border: 1px solid var(--space-whey);
   line-height: 0;
   font-size: 17px;
-  width: 25%;
+  width: 20%;
 	display: block;
   padding: 10px 15px;
   border-radius: 60px;
@@ -152,16 +160,24 @@ input[type="text"]:valid ~ label {
   perspective: 1000px; 
 }
 
- html {
-  height: 100%;
-}
-
 .loader {
+  animation: enter 6s;
   position: absolute;
   top: calc(0% - 64px);
   left: calc(50% - 32px);
   width: 64px;
   height: 64px;
+  border-radius: 50%;
+  perspective: 800px;
+}
+
+.loaderbig {
+  animation: enter 6s;
+  position: absolute;
+  top: calc(0% - 250px);
+  left: calc(55% - 16px);
+  width: 1200px;
+  height: 1200px;
   border-radius: 50%;
   perspective: 800px;
 }
@@ -219,5 +235,14 @@ input[type="text"]:valid ~ label {
   }
   100% {
     transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
+  }
+}
+
+@keyframes enter {
+  0% {
+    opacity: 25%;
+  }
+  100% {
+    opacity: 100%;
   }
 }
