@@ -1,0 +1,313 @@
+:root {
+    --space-whey: white;
+    --space-red: #6495ED;
+    --space-maroon: #7CB9E8;
+    --space-shadow: #B2FFFF;
+}
+  
+html, body {
+  height: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+body {
+  background: linear-gradient(180deg, rgba(19,102,182,0.9332107843137255) 48%, rgba(69,252,241,0.4318102240896359) 100%);
+  font-family: Helvetica, sans-serif;
+  font-weight: light;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--space-whey);
+  text-decoration: none;
+}
+
+p {
+  margin: auto;
+  margin-top: 20px;
+  color: var(--space-whey);
+  font-family: Helvetica, sans-serif;
+  font-weight: light;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  font-family: Helvetica, sans-serif;
+  font-weight: light;
+  -webkit-font-smoothing: antialiased;
+}
+
+#status {
+  font-size: 10px;
+}
+
+#container {
+	display: inline-block;
+	position: relative;
+}
+
+#host {
+  position: absolute;
+  top: 45px;
+  font-size: 10px;
+  font-style: italic;
+  margin-left: 5px;
+  margin-bottom: 20px;
+}
+
+#accounts {
+  color: var(--space-whey);
+  border: 1pt solid black;
+  font-size: 1rem;
+  min-height: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.account {
+  padding: 0.4rem;
+  cursor: pointer;
+}
+
+#loader_box {
+  padding-top: 0.4rem;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
+}
+.loader {
+  width: 2rem;
+  height: 2rem;
+  border: 5px solid black;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+.transition, form button, form .question label, form .question input[type="text"] {
+  -moz-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
+  -o-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
+  -webkit-transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
+  transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
+}
+
+.app {
+  border-radius: 60px;
+}
+
+.app:hover {
+  background-color: var(--space-whey);
+}
+
+.field_interface {
+  display: inline-block;
+  height: 97%; 
+  width: 20%;
+  background: rgba(255, 255, 255, .25);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid var(--space-whey);
+}
+
+.field_interface h1 {
+	text-shadow: 1px 1px 3px var(--space-shadow);
+  display: inline-block;
+  color: var(--space-whey);
+  font-weight: 100;
+  letter-spacing: 0.01em;
+  margin-left: 0px;
+}
+
+.field_interface h2 {
+	font-size: small;
+  color: var(--space-whey);
+  font-weight: 60;
+  letter-spacing: 0.01em;
+  margin-left: 5px;
+}
+
+.field_interface img {
+  display: inline-block;
+}
+
+.field_app {
+    margin-left: 20px;
+  display: inline-block;
+  position: absolute;
+  width: 77%;
+  height: 97%;
+  background: rgba(255, 255, 255, .25);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid var(--space-whey);
+}
+
+.field_app h1 {
+  display: inline-block;
+  color: var(--space-whey);
+  font-weight: 100;
+  letter-spacing: 0.01em;
+  margin-left: 5px;
+  margin-bottom: 35px;
+}
+
+.field_app h2 {
+	position: relative;
+  color: var(--space-whey);
+  font-weight: 100;
+  letter-spacing: 0.01em;
+	float: left;
+	z-index: 3;
+}
+
+button {
+  border: 1px solid var(--space-whey);
+  line-height: 0;
+  font-size: 17px;
+  display: inline-block;
+  box-sizing: border-box;
+  padding: 20px 15px;
+  border-radius: 60px;
+  color: var(--space-whey);
+  font-weight: 100;
+  letter-spacing: 0.01em;
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, .25);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+button:hover, form button:focus {
+  color: white;
+  background-color: var(--space-whey);
+}
+
+form {
+    background: rgba(255, 255, 255, .25);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    display: inline-block;
+    max-width: 700px;
+    min-width: 500px;
+    box-sizing: border-box;
+    padding: 30px 25px;
+    border-radius: 40px;
+	left: 30%;
+    -moz-transform: translate(-50%, 0);
+    -ms-transform: translate(-50%, 0);
+    -webkit-transform: translate(-50%, 0);
+    transform: translate(-50%, 0);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: var(--space-whey);
+    box-shadow: 0 3px 4.5px -2px var(--space-shadow);
+}
+
+form h1 {
+  color: var(--space-whey);
+  font-weight: 100;
+  letter-spacing: 0.01em;
+  margin-left: 15px;
+  margin-bottom: 35px;
+}
+
+form h2 {
+  color: var(--space-whey);
+  font-weight: 60;
+  letter-spacing: 0.01em;
+  margin-left: 5px;
+  margin-bottom: 35px;
+	margin-top: 0px;
+	float: left;
+}
+
+form .question {
+  position: relative;
+  padding: 10px 0;
+}
+
+form .question:first-of-type {
+  padding-top: 0;
+}
+
+form .question:last-of-type {
+  padding-bottom: 0;
+}
+
+form .question label {
+  font-style: italic;
+  transform-origin: left center;
+  color: white;
+  font-weight: 100;
+  letter-spacing: 0.01em;
+  font-size: 14px;
+  box-sizing: border-box;
+  padding: 10px 15px;
+  display: block;
+  position: absolute;
+  margin-top: -40px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+form .question input[type="text"] {
+  appearance: none;
+  background-color: var(--space-maroon);
+  border: 1px solid var(--space-whey);
+  line-height: 0;
+  font-size: 17px;
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+  padding: 10px 15px;
+  border-radius: 60px;
+  color: white;
+  font-weight: 100;
+  letter-spacing: 0.01em;
+  position: relative;
+  z-index: 1;
+}
+
+form .question input[type="text"]:focus {
+  outline: none;
+  background: white;
+  color: var(--space-maroon);
+}
+
+form .question input[type="text"]:focus ~ label {
+  color: var(--space-whey);
+  -moz-transform: translate(5px, -35px) scale(0.6);
+  -ms-transform: translate(5px, -35px) scale(0.6);
+  -webkit-transform: translate(5px, -35px) scale(0.6);
+  transform: translate(5px, -35px) scale(0.6);
+}
+
+form .question input[type="text"]:valid ~ label {
+  font-style: italic;
+  -moz-transform: translate(5px, -35px) scale(0.6);
+  -ms-transform: translate(5px, -35px) scale(0.6);
+  -webkit-transform: translate(5px, -35px) scale(0.6);
+  transform: translate(5px, -35px) scale(0.6);
+}
+
+form .container {
+	display: inline-block;
+	position: relative;
+    color: black;
+	width: 20%;
+}
+
+  

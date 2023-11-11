@@ -16,7 +16,6 @@ async function loginResponse(endpoint, email, password, aborter) {
 function main() {
     const pass = document.getElementById('pass');
     const email = document.getElementById('email');
-    email.value = localStorage.getItem('email');
     const enterButton = document.getElementById('enter');
     const inputs = document.querySelectorAll('input');
 
@@ -80,3 +79,9 @@ function main() {
 }
 
 document.addEventListener('DOMContentLoaded', main);
+
+window.onload = function() {
+    const email = document.getElementById('email');
+    email.value = localStorage.getItem('email');
+}
+
