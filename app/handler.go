@@ -80,8 +80,6 @@ func AccountLogin(ctx context.Context, app *App) http.Handler {
 		q := r.URL.Query()
 		email := strings.TrimSpace(q.Get("q"))
 		password := strings.TrimSpace(q.Get("p"))
-		app.Logger(ctx).Debug(email)
-		app.Logger(ctx).Debug(password)
 
 		app.mu.Lock()
 		result, err := app.login.Get().Login(ctx, email, password)

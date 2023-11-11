@@ -34,8 +34,10 @@ func (l *login) Login(ctx context.Context, email string, password string) (bool,
 	fetchedAccount, err := database.FetchAccount(ctx, email)
 	if err != nil {
 		log.Error("vivian: ERROR! failure fetching account, user does not exist", "err", http.StatusNotFound)
+		return false, nil
 	}
 
+	//DAMN! this VerifyHash takes a while
 	if email == fetchedAccount.Email && utils.VerfiyHashPassword(fetchedAccount.Password, password) {
 		log.Debug("vivian: SUCCESS! fetched account: ", "alias", fetchedAccount.Alias)
 		return true, nil
