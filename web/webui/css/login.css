@@ -12,7 +12,7 @@ html, body {
 }
 
 body {
-	background: radial-gradient(circle at 100%, var(--space-maroon), var(--space-maroon) 60%, #dfa5a5 75%, var(--space-maroon) 75%, transparent), radial-gradient(ellipse at top, var(--space-maroon), var(--space-maroon) 50%, #eee 75%, var(--space-maroon) 75%, transparent);
+	background-color: var(--space-maroon);
   font-family: Helvetica, sans-serif;
   font-weight: light;
   -webkit-font-smoothing: antialiased;
@@ -72,43 +72,50 @@ p {
 }
 
 button {
-	box-shadow: 0 4px 2px -2px lightpink;
+	box-shadow: 0;
   background-color: var(--space-whey);
   border: 1px solid var(--space-red);
   line-height: 0;
-  font-size: 15px;
-  padding: 20px 15px;
+  font-size: 14px;
+  padding: 15px 17.5px;
   border-radius: 60px;
   color: var(--space-red);
   font-weight: 100;
   letter-spacing: 0.01em;
   position: relative;
   z-index: 1;
+	transition: box-shadow 0.5s
+}
+
+input[type="text"]:hover {
+	box-shadow: 0 6px 9px -2px lightpink;
 }
 
 button:hover, form button:focus {
   color: var(--space-whey);
   background-color: var(--space-red);
+	border-color: var(--space-whey);
 	box-shadow: 0 6px 9px -2px lightpink;
 }
 
 input[type="text"] {
-	box-shadow: 0 6px 9px -2px rgb(252, 142, 159);
-	left: 38.7%;
+	text-align: center;
+	box-shadow: 0 3px 6px -1px lightpink;
+	left: 39.5%;
   position: relative;
   margin-bottom: 20px;
   background-color: var(--space-whey);
   border: 1px solid var(--space-whey);
   line-height: 0;
-  font-size: 17px;
+  font-size: 14px;
   width: 20%;
 	display: block;
-  padding: 10px 15px;
+  padding: 4px 5px;
   border-radius: 60px;
   color: var(--space-red);
   font-weight: 100;
   letter-spacing: 0.01em;
-  
+	transition: box-shadow 0.5s;
 }
 
 input[type="text"]:focus {
@@ -149,7 +156,7 @@ input[type="text"]:valid ~ label {
   }
 
   40%, 60% {
-    transform: translate3d(4px, 0, 0);
+    transform: translate3d(3px, 0, 0);
   } 
 }
 
@@ -161,23 +168,13 @@ input[type="text"]:valid ~ label {
 }
 
 .loader {
-  animation: enter 6s;
+	margin-bottom: 40px;
+  animation: enter 3s;
   position: absolute;
   top: calc(0% - 64px);
   left: calc(50% - 32px);
   width: 64px;
   height: 64px;
-  border-radius: 50%;
-  perspective: 800px;
-}
-
-.loaderbig {
-  animation: enter 6s;
-  position: absolute;
-  top: calc(0% - 250px);
-  left: calc(55% - 16px);
-  width: 1200px;
-  height: 1200px;
   border-radius: 50%;
   perspective: 800px;
 }
@@ -234,7 +231,7 @@ input[type="text"]:valid ~ label {
     transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg);
   }
   100% {
-    transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
+    transform:  rotateX(35deg) rotateY(55deg) rotateZ(360deg);
   }
 }
 
@@ -246,3 +243,40 @@ input[type="text"]:valid ~ label {
     opacity: 100%;
   }
 }
+
+.loaderbig {
+  animation: enter 6s;
+  position: absolute;
+  top: calc(0% - 500px);
+  left: calc(55% - 800px);
+  width: 2000px;
+  height: 2000px;
+  border-radius: 50%;
+  perspective: 1200px;
+}
+
+.innerbig {
+  position: absolute;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;  
+}
+
+.innerbig.three {
+  right: 0%;
+  bottom: 0%;
+  animation: rotate-threex 4s linear infinite;
+  border-top: 3px solid var(--space-whey);;
+}
+
+
+@keyframes rotate-threex {
+  0% {
+    transform: rotateX(35deg) rotateZ(0deg);
+  }
+  100% {
+    transform:  rotateX(35deg) rotateZ(360deg);
+  }
+}
+

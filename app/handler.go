@@ -77,16 +77,11 @@ func FetchUsers(ctx context.Context, app *App) http.Handler {
 func AccountLogin(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var result bool
-		query := strings.TrimSpace(r.URL.RawQuery)
-		creds := strings.FieldsFunc(query, Split)
-
-		if len(creds) < 2 {
-			app.Logger(ctx).Error("vivian: ERROR! missing field, killing handle..", "err", http.StatusBadRequest)
-			return
-		}
-
-		email := strings.TrimSpace(creds[0])
-		password := strings.TrimSpace(creds[1])
+		q := r.URL.Query()
+		email := strings.TrimSpace(q.Get("q"))
+		password := strings.TrimSpace(q.Get("p"))
+		app.Logger(ctx).Debug(email)
+		app.Logger(ctx).Debug(password)
 
 		app.mu.Lock()
 		result, err := app.login.Get().Login(ctx, email, password)

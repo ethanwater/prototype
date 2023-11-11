@@ -59,6 +59,6 @@ func Deploy(ctx context.Context, app *App) error {
 
 
 	
-	//return http.Serve(app.listener, app.handler)
-	return http.ServeTLS(app.listener, app.handler, "certificates/server.crt", "certificates/server.key")
+	return http.Serve(app.listener, app.handler)
+	//return http.ServeTLS(app.listener, app.handler, "certificates/server.crt", "certificates/server.key")
 }

@@ -75,23 +75,23 @@ func FetchDatabaseData(ctx context.Context) ([]models.Account, error) {
 func FetchAccount(ctx context.Context, email string) (models.Account, error) {
 	database := FetchDatabase(ctx)
 
-	rows, err := database.Query("SELECT * FROM users WHERE email = ?", email)
+	// Use a prepared statement
+	stmt, err := database.Prepare("SELECT * FROM users WHERE email = ?")
 	if err != nil {
-		//TODO:
-		fmt.Println("nope")
+		return models.Account{}, fmt.Errorf("failed to prepare statement: %w", err)
 	}
-	defer rows.Close()
+	defer stmt.Close()
 
-	// An album slice to hold data from returned rows.
 	var acc models.Account
-	// Loop through rows, using Scan to assign column data to struct fields.
-	for rows.Next() {
-		if err := rows.Scan(&acc.ID, &acc.Alias, &acc.Name, &acc.Email, &acc.Password, &acc.Tier); err != nil {
-			return acc, err
+	// Execute the prepared statement with the email parameter
+	err = stmt.QueryRow(email).Scan(&acc.ID, &acc.Alias, &acc.Name, &acc.Email, &acc.Password, &acc.Tier)
+	if err != nil {
+		// Handle the error appropriately
+		if err == sql.ErrNoRows {
+			// No rows found, return a specific error or handle it accordingly
+			return models.Account{}, fmt.Errorf("no account found for email: %w", err)
 		}
-	}
-	if err = rows.Err(); err != nil {
-		return acc, err
+		return models.Account{}, fmt.Errorf("failed to fetch account: %w", err)
 	}
 	return acc, nil
 }
