@@ -20,7 +20,7 @@ func GenerateTwoFactorAuth(ctx context.Context, app *App) http.Handler {
 		if err != nil {
 			//https://go.dev/src/net/http/status.go
 			app.Logger(ctx).Error("vivian: ERROR!", "failure generate authentication key", http.StatusBadRequest)
-			GenerateTwoFactorAuth(ctx, app) //may cause a race, TODO: check this line out
+			//GenerateTwoFactorAuth(ctx, app) //may cause a race, TODO: check this line out
 			return
 		}
 		app.Logger(ctx).Debug("vivian: SUCCESS!", "authentication key recieved", http.StatusOK)
