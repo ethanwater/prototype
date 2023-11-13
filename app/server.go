@@ -10,8 +10,8 @@ import (
 	"vivianlab/web"
 
 	"log"
-	"os"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/ServiceWeaver/weaver"
@@ -63,10 +63,10 @@ func Deploy(ctx context.Context, app *App) error {
 	appHandler.Handle("/echo", EchoResponse(ctx, app))
 	appHandler.Handle("/fetch", FetchUsers(ctx, app))
 	appHandler.Handle("/login", weaver.InstrumentHandler("login", AccountLogin(ctx, app)))
+	appHandler.Handle("/generatekey", GenerateTwoFactorAuth(ctx, app))
+	appHandler.Handle("/verifykey", VerifyTwoFactorAuth(ctx, app))
 	appHandler.HandleFunc(weaver.HealthzURL, weaver.HealthzHandler)
 
-
-	
 	return http.Serve(app.listener, app.handler)
 	//return http.ServeTLS(app.listener, app.handler, "certificates/server.crt", "certificates/server.key")
 }

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"math/rand"
 	"strings"
 	"sync"
@@ -38,7 +39,7 @@ func (r *Receiver) MobileSendAuthKey2FA(authKey string) error {
 // GenerateAuthKey2FA generates a 2FA authentication key.
 // The generated key will be hashed and stored via localStorage in JavaScript
 // and should be removed from localStorage cache once verified.
-func GenerateAuthKey2FA(receiver Receiver) (string, error) {
+func GenerateAuthKey2FA() (string, error) {
 	var mu sync.Mutex
 	mu.Lock()
 	defer mu.Unlock()
@@ -51,15 +52,16 @@ func GenerateAuthKey2FA(receiver Receiver) (string, error) {
 		authKey.WriteString(string(charset[sample]))
 	}
 
-	switch receiver.Receiver {
-	case Email:
-		receiver.EmailSendAuthKey2FA(authKey.String())
-	case Mobile:
-		receiver.MobileSendAuthKey2FA(authKey.String())
-	}
+	//switch receiver.Receiver {
+	//case Email:
+	//	receiver.EmailSendAuthKey2FA(authKey.String())
+	//case Mobile:
+	//	receiver.MobileSendAuthKey2FA(authKey.String())
+	//}
 
+	fmt.Println(authKey.String())
 	authKeyHash, error := HashPassword(authKey.String())
-	return string(authKeyHash), error
+	return authKeyHash, error
 }
 
 func VerifyAuthKey2FA(authkey_hash, input string) bool {

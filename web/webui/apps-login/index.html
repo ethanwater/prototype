@@ -20,9 +20,20 @@
       <input type="email" id="email"class="email_icon" placeholder="email"required>
       <input type="password" id="pass" class="password_icon" placeholder="password"required>
       <p id="show_hide" class="showhide">show</p>
+      <div id="verify"></div>
       <button id="enter">enter</button> 
       <p id="mark">© 2023 Vivian</p>
     </div>
 	</body>
 </html>
+
+<script>
+  function focusNextInput(currentInput) {
+    var currentIndex = Array.from(document.querySelectorAll('.symbol')).indexOf(currentInput);
+    var nextInput = document.querySelectorAll('.symbol')[currentIndex + 1];
+    if (nextInput) {
+        nextInput.focus();
+    }
+  }
+</script>
 

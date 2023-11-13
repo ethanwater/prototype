@@ -8,10 +8,56 @@ import (
 	"strings"
 
 	"vivianlab/pkg/database"
+	"vivianlab/pkg/utils"
 )
 
 func Split(r rune) bool {
 	return r == '&' || r == ','
+}
+
+func GenerateTwoFactorAuth(ctx context.Context, app *App) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authkey, err := utils.GenerateAuthKey2FA()
+		if err != nil {
+			app.Logger(ctx).Error("vivian: ERROR!", "err", err)
+		}
+		app.Logger(ctx).Debug(authkey)
+
+		bytes, err := json.Marshal(authkey)
+		if err != nil {
+			app.Logger(r.Context()).Error("vivian: ERROR! failure marshalling resullts", "err", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
+			app.Logger(r.Context()).Error("vivian: ERROR! failure writing search results", "err", err)
+		}
+	})
+}
+
+func VerifyTwoFactorAuth(ctx context.Context, app *App) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		hash := strings.TrimSpace(q.Get("hash"))
+		input := strings.TrimSpace(q.Get("input"))
+
+		result := utils.VerifyAuthKey2FA(hash, input)
+		if !result {
+			app.Logger(ctx).Debug("false")
+		} else {
+			app.Logger(ctx).Debug("true")
+		}
+
+		bytes, err := json.Marshal(result)
+		if err != nil {
+			app.Logger(r.Context()).Error("vivian: ERROR! failure marshalling resullts", "err", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
+			app.Logger(r.Context()).Error("vivian: ERROR! failure writing search results", "err", err)
+		}
+	})
 }
 
 func EchoResponse(ctx context.Context, app *App) http.Handler {

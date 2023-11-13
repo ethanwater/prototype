@@ -75,8 +75,6 @@ p {
 
 
 button {
-  opacity: 0.5;
-  pointer-events: none;
 	box-shadow: 0;
   background-color: var(--space-whey);
   border: 1px solid var(--space-red);

@@ -12,6 +12,80 @@ async function loginResponse(endpoint, email, password, aborter) {
         throw new Error(text);
     }
 }
+async function fetchKey(endpoint, aborter) {
+    const response = await fetch(`/${endpoint}`, {signal: aborter});
+    const text = await response.text();
+    if (response.ok) {
+      return text;
+    } else {
+      throw new Error(text);
+    }
+}
+
+async function verifyCode(endpoint, hash, input, aborter) {
+    const response = await fetch(`/${endpoint}?hash=${encodeURIComponent(hash)}&input=${encodeURIComponent(input)}`, {
+        signal: aborter.signal,
+    });
+    const text = await response.text();
+
+    if (response.ok) {
+        console.log("success")
+        return text;
+    } else {
+        throw new Error(text);
+    }
+}
+
+async function retrieveCode() {
+    var inputValues = Array.from(document.querySelectorAll('.symbol')).map(input => input.value);
+    var input = inputValues.toString().replaceAll(",", "");
+
+
+    var controller = new AbortController();
+    for (const endpoint of ['verifykey']) {
+        const responseText = await verifyCode(endpoint, localStorage.getItem("key"), input.toUpperCase(), controller);
+        const results = JSON.parse(responseText);
+
+        console.log(results);
+    }
+}
+
+function createVerificationElement() {
+    if (!document.getElementById("verifyid")) {
+        var container = document.getElementById("verify");
+        var verificationDiv = document.createElement("div");
+        verificationDiv.className = "verification";
+        verificationDiv.id = "verifyid";
+
+        for (var i = 1; i <= 5; i++) {
+            var input = document.createElement("input");
+            input.id = "code" + i;
+            input.type = "code";
+            input.className = "symbol";
+            input.maxLength = 1;
+            input.setAttribute("oninput", "focusNextInput(this)");
+            input.required = true;
+
+            verificationDiv.appendChild(input);
+        }
+
+        container.appendChild(verificationDiv);
+        document.getElementById("code1").focus();
+    }
+
+}
+
+function showPassword() {
+    var x = document.getElementById("pass");
+    var showButton = document.getElementById('show_hide');
+    if (x.type === "password") {
+        x.type = "text";
+        showButton.innerText = "hide";
+    } else {
+        x.type = "password";
+        showButton.innerText = "show";
+    }
+}
 
 function errorMessage(msg) {
     if (!document.getElementById("error")) {
@@ -27,23 +101,12 @@ function errorMessage(msg) {
     }
 }
 
-function showPassword() {
-    var x = document.getElementById("pass");
-    var showButton = document.getElementById('show_hide');
-    if (x.type === "password") {
-        x.type = "text";
-        showButton.innerText = "hide";
-    } else {
-        x.type = "password";
-        showButton.innerText = "show";
-    }
-}
-
 function main() {
     const pass = document.getElementById('pass');
     const email = document.getElementById('email');
     const enterButton = document.getElementById('enter');
     const showButton = document.getElementById('show_hide');
+    const codeButton = document.getElementById('codeEnter');
     const inputs = document.querySelectorAll('input');
 
     let controller;
@@ -62,7 +125,13 @@ function main() {
 
     const maxAttempts = 10;
     var attempts = 0;
+    var ifVerifiedBasic = false;
+
+    //TODO: only perform 2FA if enabled, this is for testing
     const login = async () => {
+        if (ifVerifiedBasic == true) {
+            return;
+        }
         //if (localStorage.getItem("locked") == "true") {
         //    errorMessage("too many login attempts");
         //    return;
@@ -108,7 +177,27 @@ function main() {
                         return;
                     }
                 } else {
-                    window.location.assign("../apps-echo/index.html");
+                    createVerificationElement();
+                    ifVerifiedBasic = true;
+                    for (const endpoint of ['generatekey']) {
+                        fetchKey(endpoint, controller.signal).then((v) => {
+                            const results = JSON.parse(v);
+                            if (results == null || results.length == 0) {
+                              return;
+                            }
+                            localStorage.setItem("key",results);
+                        })
+                    }
+
+                    //clears email and pass divs to replace with verification element
+                    //email.style.display = 'none';
+                    //email.style.visibility = 'hidden';
+                    //pass.style.display = 'none';
+                    //pass.style.visibility = 'hidden';
+
+                    enterButton.style.opacity = 1;
+                    enterButton.style.pointerEvents = 'all';
+                    enterButton.innerText = 'verify';
                 }
             }
             email.disabled = false;
@@ -116,6 +205,11 @@ function main() {
         } catch (error) {
             errorMessage("server error: cannot validate")
             console.error(error);
+        }
+
+        if (ifVerifiedBasic == true) {
+            email.disabled = true;
+            pass.disabled = true;
         }
     };
 
@@ -127,12 +221,25 @@ function main() {
     //})
 
     document.addEventListener('keypress', (e) => {
-        if (e.key == 'Enter' && pass.validity.valid && email.validity.valid) {
-            login();
+        if (!ifVerifiedBasic) {
+            if (e.key == 'Enter' && pass.validity.valid && email.validity.valid) {
+                login();
+            }
+        } else {
+            if (e.key == 'Enter') {
+                retrieveCode();
+            }
         }
     });
 
-    enterButton.addEventListener('click', login);
+    enterButton.addEventListener('click', () => {
+        if(!ifVerifiedBasic) {
+            login();
+        } else {
+            retrieveCode();
+        }
+    });  
+
     showButton.addEventListener('click', showPassword);
 }
 
