@@ -100,7 +100,12 @@ function main() {
                         //localStorage.setItem("locked", "true");
                         errorMessage("too many login attempts");
                         pass.value = "";
+                        email.value = "";
                         pass.innerText = "";
+                        email.innerText = "";
+                        email.disabled = true;
+                        pass.disabled = true;
+                        return;
                     }
                 } else {
                     window.location.assign("../apps-echo/index.html");
