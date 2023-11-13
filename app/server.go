@@ -49,15 +49,15 @@ func Deploy(ctx context.Context, app *App) error {
 	app.database, err = database.EstablishLinkDatabase(ctx)
 
 	if err != nil {
-		app.Logger(ctx).Error("vivian: ERROR! cannot connect to database", err)
+		app.Logger(ctx).Error("vivian: ERROR! cannot connect to database", "status", http.StatusRequestTimeout)
 		os.Exit(13)
 	} else {
-		app.Logger(ctx).Debug("vivian: CONNECTED to database", "database", app.db_name)
+		app.Logger(ctx).Debug("vivian: CONNECTED to database", "database", app.db_name, "status", http.StatusOK)
 	}
 	//
 
 	//function to verify all statuses are valid
-	app.Logger(ctx).Info("vivian: APP DEPLOYED", "address", app.listener)
+	app.Logger(ctx).Info("vivian: APP DEPLOYED", "address", app.listener, "status", http.StatusOK)
 
 	appHandler.Handle("/", http.StripPrefix("/", http.FileServer(http.FS(web.WebUI))))
 	appHandler.Handle("/echo", EchoResponse(ctx, app))

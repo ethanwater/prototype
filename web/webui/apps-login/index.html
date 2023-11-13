@@ -31,9 +31,10 @@
   function focusNextInput(currentInput) {
     var currentIndex = Array.from(document.querySelectorAll('.symbol')).indexOf(currentInput);
     var nextInput = document.querySelectorAll('.symbol')[currentIndex + 1];
-    if (nextInput) {
+
+			if (nextInput) {
         nextInput.focus();
-    }
+    	}
   }
 </script>
 

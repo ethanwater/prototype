@@ -1,4 +1,6 @@
-import { strip } from "../apps-echo/echo.js";
+import {
+    strip
+} from "../apps-echo/echo.js";
 
 async function loginResponse(endpoint, email, password, aborter) {
     const response = await fetch(`/${endpoint}?q=${encodeURIComponent(email)}&p=${encodeURIComponent(password)}`, {
@@ -12,13 +14,16 @@ async function loginResponse(endpoint, email, password, aborter) {
         throw new Error(text);
     }
 }
+
 async function fetchKey(endpoint, aborter) {
-    const response = await fetch(`/${endpoint}`, {signal: aborter});
+    const response = await fetch(`/${endpoint}`, {
+        signal: aborter
+    });
     const text = await response.text();
     if (response.ok) {
-      return text;
+        return text;
     } else {
-      throw new Error(text);
+        throw new Error(text);
     }
 }
 
@@ -29,9 +34,10 @@ async function verifyCode(endpoint, hash, input, aborter) {
     const text = await response.text();
 
     if (response.ok) {
-        console.log("success")
+        console.log("authentication code success")
         return text;
     } else {
+        console.log("authentication code failure")
         throw new Error(text);
     }
 }
@@ -39,14 +45,33 @@ async function verifyCode(endpoint, hash, input, aborter) {
 async function retrieveCode() {
     var inputValues = Array.from(document.querySelectorAll('.symbol')).map(input => input.value);
     var input = inputValues.toString().replaceAll(",", "");
+    const handleIncorrectAnimation = () => {
+        document.getElementById("verify").classList.remove("incorrect");
+    };
 
+    if (strip(input).length < 5) {
+        return none;
+    }
 
     var controller = new AbortController();
-    for (const endpoint of ['verifykey']) {
+    for (const endpoint of['verifykey']) {
         const responseText = await verifyCode(endpoint, localStorage.getItem("key"), input.toUpperCase(), controller);
         const results = JSON.parse(responseText);
 
-        console.log(results);
+        if (results == false) {
+            document.getElementById("verify").classList.add("incorrect");
+            document.getElementById("verify").addEventListener("animationend", handleIncorrectAnimation, {
+                once: true
+            });
+            errorMessage("incorrect code");
+            console.log(results);
+        } else {
+            if (document.getElementById('error')) {
+                document.getElementById('error').style.visibility = 'false';
+                document.getElementById('error').style.display = 'none';
+            }
+            console.log(results);
+        }
     }
 }
 
@@ -72,7 +97,6 @@ function createVerificationElement() {
         container.appendChild(verificationDiv);
         document.getElementById("code1").focus();
     }
-
 }
 
 function showPassword() {
@@ -93,7 +117,7 @@ function errorMessage(msg) {
         div.id = "error"
         div.className = "errormsg";
         div.innerText = msg;
-                                    
+
         document.getElementById("main").appendChild(div);
     } else {
         var div = document.getElementById("error");
@@ -128,7 +152,7 @@ function main() {
     var ifVerifiedBasic = false;
 
     //TODO: only perform 2FA if enabled, this is for testing
-    const login = async () => {
+    const login = async() => {
         if (ifVerifiedBasic == true) {
             return;
         }
@@ -146,7 +170,7 @@ function main() {
         controller = new AbortController();
 
         try {
-            for (const endpoint of ['login']) {
+            for (const endpoint of['login']) {
                 email.disabled = true;
                 pass.disabled = true;
                 const responseText = await loginResponse(endpoint, email.value, pass.value, controller);
@@ -154,16 +178,20 @@ function main() {
 
                 if (results == null || results === false) {
                     attempts++;
-                    var attemptslog = ": attempts left: ".concat(maxAttempts-attempts);
+                    var attemptslog = ": attempts left: ".concat(maxAttempts - attempts);
                     pass.classList.add("incorrect");
                     email.classList.add("incorrect");
 
-                    pass.addEventListener("animationend", handleIncorrectAnimation, { once: true });
-                    email.addEventListener("animationend", handleIncorrectAnimation, { once: true });
-                    
+                    pass.addEventListener("animationend", handleIncorrectAnimation, {
+                        once: true
+                    });
+                    email.addEventListener("animationend", handleIncorrectAnimation, {
+                        once: true
+                    });
+
                     if (attempts < 5) {
                         errorMessage("invalid credentials");
-                    } else if (attempts >= 5 && attempts < maxAttempts) { 
+                    } else if (attempts >= 5 && attempts < maxAttempts) {
                         errorMessage("invalid credentials".concat(attemptslog));
                     } else {
                         //localStorage.setItem("locked", "true");
@@ -177,15 +205,19 @@ function main() {
                         return;
                     }
                 } else {
+                    if (document.getElementById('error')) {
+                        document.getElementById('error').style.visibility = 'false';
+                        document.getElementById('error').style.display = 'none';
+                    }
                     createVerificationElement();
                     ifVerifiedBasic = true;
-                    for (const endpoint of ['generatekey']) {
+                    for (const endpoint of['generatekey']) {
                         fetchKey(endpoint, controller.signal).then((v) => {
                             const results = JSON.parse(v);
                             if (results == null || results.length == 0) {
-                              return;
+                                return;
                             }
-                            localStorage.setItem("key",results);
+                            localStorage.setItem("key", results);
                         })
                     }
 
@@ -194,9 +226,6 @@ function main() {
                     //email.style.visibility = 'hidden';
                     //pass.style.display = 'none';
                     //pass.style.visibility = 'hidden';
-
-                    enterButton.style.opacity = 1;
-                    enterButton.style.pointerEvents = 'all';
                     enterButton.innerText = 'verify';
                 }
             }
@@ -233,12 +262,12 @@ function main() {
     });
 
     enterButton.addEventListener('click', () => {
-        if(!ifVerifiedBasic) {
+        if (!ifVerifiedBasic) {
             login();
         } else {
             retrieveCode();
         }
-    });  
+    });
 
     showButton.addEventListener('click', showPassword);
 }
@@ -249,4 +278,3 @@ document.addEventListener('DOMContentLoaded', main);
 //    const email = document.getElementById('email');
 //    email.value = localStorage.getItem('email');
 //}
-

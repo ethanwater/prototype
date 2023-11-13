@@ -15,11 +15,13 @@ func Split(r rune) bool {
 	return r == '&' || r == ','
 }
 
+
 func GenerateTwoFactorAuth(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authkey, err := utils.GenerateAuthKey2FA()
 		if err != nil {
-			app.Logger(ctx).Error("vivian: ERROR!", "err", err)
+			//https://go.dev/src/net/http/status.go
+			app.Logger(ctx).Error("vivian: ERROR!", "failure genrate authentication key", http.StatusBadRequest)
 		}
 		app.Logger(ctx).Debug(authkey)
 
@@ -43,9 +45,9 @@ func VerifyTwoFactorAuth(ctx context.Context, app *App) http.Handler {
 
 		result := utils.VerifyAuthKey2FA(hash, input)
 		if !result {
-			app.Logger(ctx).Debug("false")
+			app.Logger(ctx).Debug("vivian: SUCCESS!", "code verified", result, "status", http.StatusOK)
 		} else {
-			app.Logger(ctx).Debug("true")
+			app.Logger(ctx).Debug("vivian: WARNING!", "code invalid", result)
 		}
 
 		bytes, err := json.Marshal(result)
