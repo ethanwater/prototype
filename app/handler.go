@@ -8,22 +8,22 @@ import (
 	"strings"
 
 	"vivianlab/pkg/database"
-	"vivianlab/pkg/utils"
 )
 
 func Split(r rune) bool {
 	return r == '&' || r == ','
 }
 
-
 func GenerateTwoFactorAuth(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authkey, err := utils.GenerateAuthKey2FA()
+		authkey, err := app.twoFactorAuth.Get().GenerateAuthKey2FA(ctx)
 		if err != nil {
 			//https://go.dev/src/net/http/status.go
-			app.Logger(ctx).Error("vivian: ERROR!", "failure genrate authentication key", http.StatusBadRequest)
+			app.Logger(ctx).Error("vivian: ERROR!", "failure generate authentication key", http.StatusBadRequest)
+			GenerateTwoFactorAuth(ctx, app) //may cause a race, TODO: check this line out
+			return
 		}
-		app.Logger(ctx).Debug(authkey)
+		app.Logger(ctx).Debug("vivian: SUCCESS!", "authentication key recieved", http.StatusOK)
 
 		bytes, err := json.Marshal(authkey)
 		if err != nil {
@@ -43,11 +43,14 @@ func VerifyTwoFactorAuth(ctx context.Context, app *App) http.Handler {
 		hash := strings.TrimSpace(q.Get("hash"))
 		input := strings.TrimSpace(q.Get("input"))
 
-		result := utils.VerifyAuthKey2FA(hash, input)
+		result, err := app.twoFactorAuth.Get().VerifyAuthKey2FA(ctx, hash, input)
+		if err != nil {
+			app.Logger(ctx).Error("vivian: ERROR!", "unable to verify input", http.StatusNotAcceptable)
+		}
 		if !result {
-			app.Logger(ctx).Debug("vivian: SUCCESS!", "code verified", result, "status", http.StatusOK)
+			app.Logger(ctx).Debug("vivian: WARNING!", "key invalid", http.StatusNotAcceptable)
 		} else {
-			app.Logger(ctx).Debug("vivian: WARNING!", "code invalid", result)
+			app.Logger(ctx).Debug("vivian: SUCCESS!", "key verified", result, "status", http.StatusOK)
 		}
 
 		bytes, err := json.Marshal(result)
@@ -129,12 +132,12 @@ func AccountLogin(ctx context.Context, app *App) http.Handler {
 		email := strings.TrimSpace(q.Get("q"))
 		password := strings.TrimSpace(q.Get("p"))
 
-		app.mu.Lock()
+		app.mux.Lock()
 		result, err := app.login.Get().Login(ctx, email, password)
 		if err != nil {
 			app.Logger(r.Context()).Error("vivian: ERROR! failure logging", "err", http.StatusBadRequest)
 		}
-		app.mu.Unlock()
+		app.mux.Unlock()
 
 		bytes, err := json.Marshal(result)
 		if err != nil {
