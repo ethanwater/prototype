@@ -10,6 +10,7 @@ import (
 	"vivianlab/web"
 
 	"log"
+	"os"
 	"net/http"
 	"time"
 
@@ -30,7 +31,7 @@ type App struct {
 
 	db_name  string
 	handler  http.Handler
-	Database *sql.DB
+	database *sql.DB
 }
 
 func Deploy(ctx context.Context, app *App) error {
@@ -45,10 +46,17 @@ func Deploy(ctx context.Context, app *App) error {
 
 	//TODO: non repetitive database integration
 	app.db_name = toml.Get("database.name").(string)
-	app.Database = database.EstablishLinkDatabase(ctx)
+	app.database, err = database.EstablishLinkDatabase(ctx)
+
+	if err != nil {
+		app.Logger(ctx).Error("vivian: ERROR! cannot connect to database", err)
+		os.Exit(13)
+	} else {
+		app.Logger(ctx).Debug("vivian: CONNECTED to database", "database", app.db_name)
+	}
 	//
 
-	app.Logger(ctx).Debug("vivian: CONNECTED database: ", "database", app.db_name)
+	//function to verify all statuses are valid
 	app.Logger(ctx).Info("vivian: APP DEPLOYED", "address", app.listener)
 
 	appHandler.Handle("/", http.StripPrefix("/", http.FileServer(http.FS(web.WebUI))))

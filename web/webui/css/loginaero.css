@@ -12,6 +12,7 @@
     overflow-y: hidden;
   }
   
+  
   body {
     background: linear-gradient(180deg, rgba(19,180,182,0.9332107843137255) 48%, rgba(69,252,168,1) 100%, transparent);
     /* background: rgb(19,102,182); */
@@ -28,7 +29,7 @@
   }
   
   p {
-    text-shadow: 2px 2px 20px  var(--space-shadow);
+    text-shadow: 1px 1px 7px  var(--space-shadow);
     position: relative;
     margin: auto;
     margin-top: 20px;
@@ -74,12 +75,41 @@
     transition: all 0.25s cubic-bezier(0.53, 0.01, 0.35, 1.5);
   }
   
-  
+  .email_icon {
+    background: url("../assets/user.png") no-repeat 3%;
+    background-size: 14px;
+  }
+
+  .password_icon {
+    background: url("../assets/lock.png") no-repeat 3%;
+    background-size: 14px;
+  }
+
+  .errormsg {
+    text-align: center;
+    left: 42.5%;
+    position: relative;
+    margin-bottom: 20px;
+    border: 1px solid red;
+    line-height: 0;
+    font-size: 12px;
+    width: 15%;
+    display: block;
+    padding: 17px 5px;
+    padding-left: 10px;
+    border-radius: 60px;
+    color: red;
+    font-weight: 100;
+    letter-spacing: 0.01em;
+    background: rgba(243, 4, 4, 0.516);
+    transition: box-shadow 0.5s;
+    animation: fadein 2s;
+  }
   
   button {
     opacity: 0.5;
     pointer-events: none;
-      box-shadow: 0;
+    box-shadow: 0;
     background-color: var(--space-whey);
     border: 1px solid var(--space-red);
     line-height: 0;
@@ -100,21 +130,48 @@
       border-color: var(--space-whey);
       box-shadow: 0 6px 9px -2px var(--space-shadow);
   }
+
+  .showhide {
+    opacity: 0;
+    cursor: pointer;
+    width: 20px;
+    font-size: 10px;
+    left: -120px;
+    top: -15px;
+    position: relative;
+    margin-bottom: -10px;
+    transition: opacity 0.5s;
+  }
+
+  input:valid + p {
+    opacity: 1;
+  }
   
-  input:valid + input:valid + button {
+  input:focus::placeholder {
+    opacity: 0;
+  }
+
+  input:valid + input:valid + p + button {
     opacity: 1;
     pointer-events: all;
   }
   
+  input:valid + input:valid + button + button {
+    opacity: 1;
+    pointer-events: all;
+  }   
+
   input[type="text"]:hover {
-    background: var(--space-shadow);
     box-shadow: 0 6px 9px -2px var(--space-shadow);
   }
-  
+
+  input[type="text"]:hover {
+    box-shadow: 0 6px 9px -2px var(--space-shadow);
+  }
+
   input[type="text"] {
-    text-align: center;
     box-shadow: 0 3px 6px -1px var(--space-shadow);
-    left: 39.5%;
+    left: 38.75%;
     position: relative;
     margin-bottom: 20px;
     background-color: var(--space-whey);
@@ -124,6 +181,7 @@
     width: 20%;
     display: block;
     padding: 4px 5px;
+    padding-left: 30px;
     border-radius: 60px;
     color: var(--space-red);
     font-weight: 100;
@@ -134,7 +192,7 @@
   input[type="text"]:focus {
     box-shadow: 0 8px 9px -2px var(--space-shadow);
     outline: none;
-    background: var(--space-shadow);
+    background-color: var(--space-shadow);
     color: var(--space-red);
     
   }
@@ -145,6 +203,91 @@
     -webkit-backdrop-filter: blur(10px); 
     border: 1px solid rgba(255, 255, 255, 0.3);
   }
+
+  /* */ 
+  input[type="email"]:hover {
+    box-shadow: 0 6px 9px -2px var(--space-shadow);
+  }
+
+  input[type="email"]:hover {
+    box-shadow: 0 6px 9px -2px var(--space-shadow);
+  }
+
+  input[type="email"] {
+    box-shadow: 0 3px 6px -1px var(--space-shadow);
+    left: 38.75%;
+    position: relative;
+    margin-bottom: 20px;
+    background-color: var(--space-whey);
+    border: 1px solid var(--space-whey);
+    line-height: 0;
+    font-size: 14px;
+    width: 20%;
+    display: block;
+    padding: 4px 5px;
+    padding-left: 30px;
+    border-radius: 60px;
+    color: var(--space-red);
+    font-weight: 100;
+    letter-spacing: 0.01em;
+    transition: box-shadow 0.5s, background 0.5s;
+  }
+  
+  input[type="email"]:focus {
+    box-shadow: 0 8px 9px -2px var(--space-shadow);
+    outline: none;
+    background-color: var(--space-shadow);
+    color: var(--space-red);
+    
+  }
+  
+  input[type="email"]:valid  {
+    opacity: .9;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); 
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  /**/
+  input[type="password"]:hover {
+    box-shadow: 0 6px 9px -2px var(--space-shadow);
+  }
+
+
+  input[type="password"] {
+    box-shadow: 0 3px 6px -1px var(--space-shadow);
+    left: 38.75%;
+    position: relative;
+    margin-bottom: 20px;
+    background-color: var(--space-whey);
+    border: 1px solid var(--space-whey);
+    line-height: 0;
+    font-size: 14px;
+    width: 20%;
+    display: block;
+    padding: 4px 5px;
+    padding-left: 30px;
+    border-radius: 60px;
+    color: var(--space-red);
+    font-weight: 100;
+    letter-spacing: 0.01em;
+    transition: box-shadow 0.5s, background 0.5s;
+  }
+  
+  input[type="password"]:focus {
+    box-shadow: 0 8px 9px -2px var(--space-shadow);
+    outline: none;
+    background-color: var(--space-shadow);
+    color: var(--space-red);
+    
+  }
+  
+  input[type="password"]:valid  {
+    opacity: .9;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); 
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
   
   @keyframes shake {
     10%, 90% {
@@ -282,4 +425,14 @@
     100% {
       transform:  rotateX(35deg) rotateZ(360deg);
     }
+  }
+
+  @keyframes fadein {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 100;
+    }
+    
   }

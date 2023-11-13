@@ -18,6 +18,7 @@ type login struct {
 }
 
 func (l *login) Login(ctx context.Context, email string, password string) (bool, error) {
+	//TODO: count login attempts. OK on JS end, but can still be curled via term
 	log := l.Logger(ctx)
 
 	if !utils.SanitizeEmailCheck(email) {

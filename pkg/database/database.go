@@ -11,17 +11,15 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
-func EstablishLinkDatabase(ctx context.Context) *sql.DB {
+func EstablishLinkDatabase(ctx context.Context) (*sql.DB, error) {
 	database := FetchDatabase(ctx)
 
-	go func() {
-		ping := database.Ping()
-		if ping != nil {
-			os.Exit(2)
-		}
-	}()
+	ping := database.Ping()
+	if ping != nil {
+		return database, ping
+	}
 
-	return database
+	return database, nil
 }
 
 func FetchDatabase(ctx context.Context) *sql.DB {
