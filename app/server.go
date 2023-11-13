@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"sync"
 	"vivianlab/pkg/admincontrols"
+	"vivianlab/pkg/auth"
 	"vivianlab/pkg/database"
 	"vivianlab/pkg/login"
 	"vivianlab/web"
@@ -22,12 +23,13 @@ const Timeout = 10 * time.Second
 
 type App struct {
 	weaver.Implements[weaver.Main]
-	listener weaver.Listener `weaver:"vivian"`
-	echo     weaver.Ref[admincontrols.Echo]
-	login    weaver.Ref[login.Login]
+	listener      weaver.Listener `weaver:"vivian"`
+	echo          weaver.Ref[admincontrols.Echo]
+	login         weaver.Ref[login.Login]
+	twoFactorAuth weaver.Ref[auth.TwoFactorAuthentication]
 
 	rw_timeout time.Duration
-	mu         sync.Mutex
+	mux        sync.Mutex
 
 	db_name  string
 	handler  http.Handler
@@ -59,6 +61,10 @@ func Deploy(ctx context.Context, app *App) error {
 	//function to verify all statuses are valid
 	app.Logger(ctx).Info("vivian: APP DEPLOYED", "address", app.listener, "status", http.StatusOK)
 
+	//TODO: change handle names to be discreet
+	//TODO: handles called only by registerd users
+	//TODO: addiiton middleware to verify that the request is safe
+	//TODO: test all curl commands to verify the data the user recieves
 	appHandler.Handle("/", http.StripPrefix("/", http.FileServer(http.FS(web.WebUI))))
 	appHandler.Handle("/echo", EchoResponse(ctx, app))
 	appHandler.Handle("/fetch", FetchUsers(ctx, app))

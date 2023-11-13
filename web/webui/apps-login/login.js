@@ -58,7 +58,7 @@ async function retrieveCode() {
         const responseText = await verifyCode(endpoint, localStorage.getItem("key"), input.toUpperCase(), controller);
         const results = JSON.parse(responseText);
 
-        if (results == false) {
+        if (!results) {
             document.getElementById("verify").classList.add("incorrect");
             document.getElementById("verify").addEventListener("animationend", handleIncorrectAnimation, {
                 once: true

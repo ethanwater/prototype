@@ -3,8 +3,8 @@ package login
 import (
 	"context"
 	"net/http"
+	"vivianlab/pkg/auth"
 	"vivianlab/pkg/database"
-	"vivianlab/pkg/utils"
 
 	"github.com/ServiceWeaver/weaver"
 )
@@ -21,7 +21,7 @@ func (l *login) Login(ctx context.Context, email string, password string) (bool,
 	//TODO: count login attempts. OK on JS end, but can still be curled via term
 	log := l.Logger(ctx)
 
-	if !utils.SanitizeEmailCheck(email) {
+	if !auth.SanitizeEmailCheck(email) {
 		log.Error("vivian: ERROR! invalid email address", "err", http.StatusBadRequest)
 		return false, nil
 	}
@@ -39,7 +39,7 @@ func (l *login) Login(ctx context.Context, email string, password string) (bool,
 	}
 
 	//DAMN! this VerifyHash takes a while
-	if email == fetchedAccount.Email && utils.VerfiyHashPassword(fetchedAccount.Password, password) {
+	if email == fetchedAccount.Email && auth.VerfiyHashPassword(fetchedAccount.Password, password) {
 		log.Debug("vivian: SUCCESS! fetched account: ", "alias", fetchedAccount.Alias)
 		return true, nil
 	} else {
