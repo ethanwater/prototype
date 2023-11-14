@@ -16,7 +16,7 @@ type impl struct {
 
 func (e *impl) EchoResponse(ctx context.Context, query string) error {
 	logger := e.Logger(ctx)
-	logger.Debug("vivian: ECHO", "results", query)
+	logger.Debug("vivian:", "echo", query)
 
 	return nil
 }

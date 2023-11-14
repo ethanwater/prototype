@@ -74,7 +74,6 @@ func (t *impl) VerifyAuthKey2FA(ctx context.Context, authkey_hash, input string)
 	mu.Lock()
 	defer mu.Unlock()
 
-	t.Logger(ctx).Debug("vivian: STATUS!", "action", "verifying input...")
 	if SanitizeCheck(input) {
 		status := bcrypt.CompareHashAndPassword([]byte(authkey_hash), []byte(input))
 		if status != nil {
