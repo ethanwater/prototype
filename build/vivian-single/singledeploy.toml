@@ -1,0 +1,8 @@
+[vivian]
+version = "alpha v2.0.1"
+
+[serviceweaver]
+binary = "vivian-single"
+
+[single]
+listeners.vivian = {address = "localhost:1305"}
