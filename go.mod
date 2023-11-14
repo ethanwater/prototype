@@ -5,7 +5,6 @@ go 1.21.1
 require (
 	github.com/ServiceWeaver/weaver v0.22.0
 	github.com/go-sql-driver/mysql v1.7.1
-	github.com/pelletier/go-toml v1.9.5
 	go.opentelemetry.io/otel v1.16.0
 	go.opentelemetry.io/otel/trace v1.16.0
 	golang.org/x/crypto v0.11.0
