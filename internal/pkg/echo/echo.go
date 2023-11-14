@@ -6,15 +6,15 @@ import (
 	"github.com/ServiceWeaver/weaver"
 )
 
-type Echo interface {
+type Echoer interface {
 	EchoResponse(context.Context, string) error
 }
 
-type echo struct {
-	weaver.Implements[Echo]
+type impl struct {
+	weaver.Implements[Echoer]
 }
 
-func (e *echo) EchoResponse(ctx context.Context, query string) error {
+func (e *impl) EchoResponse(ctx context.Context, query string) error {
 	logger := e.Logger(ctx)
 	logger.Debug("vivian: ECHO", "results", query)
 

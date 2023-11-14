@@ -1,12 +1,14 @@
 package auth
 
 import (
+	"context"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
 const cost int = 13
 
-func HashPassword(password string) (string, error) {
+func HashPassword(_ context.Context, password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), cost)
 	return string(hash), err
 }

@@ -17,12 +17,12 @@ func init() {
 	codegen.Register(codegen.Registration{
 		Name:  "vivianlab/internal/pkg/login/Login",
 		Iface: reflect.TypeOf((*Login)(nil)).Elem(),
-		Impl:  reflect.TypeOf(login{}),
+		Impl:  reflect.TypeOf(impl{}),
 		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
-			return login_local_stub{impl: impl.(Login), tracer: tracer, loginMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/login/Login", Method: "Login", Remote: false})}
+			return login_local_stub{impl: impl.(Login), tracer: tracer, generateAuthKey2FAMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/login/Login", Method: "GenerateAuthKey2FA", Remote: false}), loginMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/login/Login", Method: "Login", Remote: false}), verifyAuthKey2FAMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/login/Login", Method: "VerifyAuthKey2FA", Remote: false})}
 		},
 		ClientStubFn: func(stub codegen.Stub, caller string) any {
-			return login_client_stub{stub: stub, loginMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/login/Login", Method: "Login", Remote: true})}
+			return login_client_stub{stub: stub, generateAuthKey2FAMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/login/Login", Method: "GenerateAuthKey2FA", Remote: true}), loginMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/login/Login", Method: "Login", Remote: true}), verifyAuthKey2FAMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/login/Login", Method: "VerifyAuthKey2FA", Remote: true})}
 		},
 		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
 			return login_server_stub{impl: impl.(Login), addLoad: addLoad}
@@ -30,26 +30,48 @@ func init() {
 		ReflectStubFn: func(caller func(string, context.Context, []any, []any) error) any {
 			return login_reflect_stub{caller: caller}
 		},
-		RefData: "",
+		RefData: "⟦5f3fc6dc:wEaVeReDgE:vivianlab/internal/pkg/login/Login→vivianlab/internal/pkg/auth/Authenticator⟧\n",
 	})
 }
 
 // weaver.InstanceOf checks.
-var _ weaver.InstanceOf[Login] = (*login)(nil)
+var _ weaver.InstanceOf[Login] = (*impl)(nil)
 
 // weaver.Router checks.
-var _ weaver.Unrouted = (*login)(nil)
+var _ weaver.Unrouted = (*impl)(nil)
 
 // Local stub implementations.
 
 type login_local_stub struct {
-	impl         Login
-	tracer       trace.Tracer
-	loginMetrics *codegen.MethodMetrics
+	impl                      Login
+	tracer                    trace.Tracer
+	generateAuthKey2FAMetrics *codegen.MethodMetrics
+	loginMetrics              *codegen.MethodMetrics
+	verifyAuthKey2FAMetrics   *codegen.MethodMetrics
 }
 
 // Check that login_local_stub implements the Login interface.
 var _ Login = (*login_local_stub)(nil)
+
+func (s login_local_stub) GenerateAuthKey2FA(ctx context.Context) (r0 string, err error) {
+	// Update metrics.
+	begin := s.generateAuthKey2FAMetrics.Begin()
+	defer func() { s.generateAuthKey2FAMetrics.End(begin, err != nil, 0, 0) }()
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.tracer.Start(ctx, "login.Login.GenerateAuthKey2FA", trace.WithSpanKind(trace.SpanKindInternal))
+		defer func() {
+			if err != nil {
+				span.RecordError(err)
+				span.SetStatus(codes.Error, err.Error())
+			}
+			span.End()
+		}()
+	}
+
+	return s.impl.GenerateAuthKey2FA(ctx)
+}
 
 func (s login_local_stub) Login(ctx context.Context, a0 string, a1 string) (r0 bool, err error) {
 	// Update metrics.
@@ -71,15 +93,84 @@ func (s login_local_stub) Login(ctx context.Context, a0 string, a1 string) (r0 b
 	return s.impl.Login(ctx, a0, a1)
 }
 
+func (s login_local_stub) VerifyAuthKey2FA(ctx context.Context, a0 string, a1 string) (r0 bool, err error) {
+	// Update metrics.
+	begin := s.verifyAuthKey2FAMetrics.Begin()
+	defer func() { s.verifyAuthKey2FAMetrics.End(begin, err != nil, 0, 0) }()
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.tracer.Start(ctx, "login.Login.VerifyAuthKey2FA", trace.WithSpanKind(trace.SpanKindInternal))
+		defer func() {
+			if err != nil {
+				span.RecordError(err)
+				span.SetStatus(codes.Error, err.Error())
+			}
+			span.End()
+		}()
+	}
+
+	return s.impl.VerifyAuthKey2FA(ctx, a0, a1)
+}
+
 // Client stub implementations.
 
 type login_client_stub struct {
-	stub         codegen.Stub
-	loginMetrics *codegen.MethodMetrics
+	stub                      codegen.Stub
+	generateAuthKey2FAMetrics *codegen.MethodMetrics
+	loginMetrics              *codegen.MethodMetrics
+	verifyAuthKey2FAMetrics   *codegen.MethodMetrics
 }
 
 // Check that login_client_stub implements the Login interface.
 var _ Login = (*login_client_stub)(nil)
+
+func (s login_client_stub) GenerateAuthKey2FA(ctx context.Context) (r0 string, err error) {
+	// Update metrics.
+	var requestBytes, replyBytes int
+	begin := s.generateAuthKey2FAMetrics.Begin()
+	defer func() { s.generateAuthKey2FAMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
+
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.stub.Tracer().Start(ctx, "login.Login.GenerateAuthKey2FA", trace.WithSpanKind(trace.SpanKindClient))
+	}
+
+	defer func() {
+		// Catch and return any panics detected during encoding/decoding/rpc.
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+			if err != nil {
+				err = errors.Join(weaver.RemoteCallError, err)
+			}
+		}
+
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+		}
+		span.End()
+
+	}()
+
+	var shardKey uint64
+
+	// Call the remote method.
+	var results []byte
+	results, err = s.stub.Run(ctx, 0, nil, shardKey)
+	replyBytes = len(results)
+	if err != nil {
+		err = errors.Join(weaver.RemoteCallError, err)
+		return
+	}
+
+	// Decode the results.
+	dec := codegen.NewDecoder(results)
+	r0 = dec.String()
+	err = dec.Error()
+	return
+}
 
 func (s login_client_stub) Login(ctx context.Context, a0 string, a1 string) (r0 bool, err error) {
 	// Update metrics.
@@ -125,7 +216,65 @@ func (s login_client_stub) Login(ctx context.Context, a0 string, a1 string) (r0 
 	// Call the remote method.
 	requestBytes = len(enc.Data())
 	var results []byte
-	results, err = s.stub.Run(ctx, 0, enc.Data(), shardKey)
+	results, err = s.stub.Run(ctx, 1, enc.Data(), shardKey)
+	replyBytes = len(results)
+	if err != nil {
+		err = errors.Join(weaver.RemoteCallError, err)
+		return
+	}
+
+	// Decode the results.
+	dec := codegen.NewDecoder(results)
+	r0 = dec.Bool()
+	err = dec.Error()
+	return
+}
+
+func (s login_client_stub) VerifyAuthKey2FA(ctx context.Context, a0 string, a1 string) (r0 bool, err error) {
+	// Update metrics.
+	var requestBytes, replyBytes int
+	begin := s.verifyAuthKey2FAMetrics.Begin()
+	defer func() { s.verifyAuthKey2FAMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
+
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.stub.Tracer().Start(ctx, "login.Login.VerifyAuthKey2FA", trace.WithSpanKind(trace.SpanKindClient))
+	}
+
+	defer func() {
+		// Catch and return any panics detected during encoding/decoding/rpc.
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+			if err != nil {
+				err = errors.Join(weaver.RemoteCallError, err)
+			}
+		}
+
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+		}
+		span.End()
+
+	}()
+
+	// Preallocate a buffer of the right size.
+	size := 0
+	size += (4 + len(a0))
+	size += (4 + len(a1))
+	enc := codegen.NewEncoder()
+	enc.Reset(size)
+
+	// Encode arguments.
+	enc.String(a0)
+	enc.String(a1)
+	var shardKey uint64
+
+	// Call the remote method.
+	requestBytes = len(enc.Data())
+	var results []byte
+	results, err = s.stub.Run(ctx, 2, enc.Data(), shardKey)
 	replyBytes = len(results)
 	if err != nil {
 		err = errors.Join(weaver.RemoteCallError, err)
@@ -175,11 +324,35 @@ var _ codegen.Server = (*login_server_stub)(nil)
 // GetStubFn implements the codegen.Server interface.
 func (s login_server_stub) GetStubFn(method string) func(ctx context.Context, args []byte) ([]byte, error) {
 	switch method {
+	case "GenerateAuthKey2FA":
+		return s.generateAuthKey2FA
 	case "Login":
 		return s.login
+	case "VerifyAuthKey2FA":
+		return s.verifyAuthKey2FA
 	default:
 		return nil
 	}
+}
+
+func (s login_server_stub) generateAuthKey2FA(ctx context.Context, args []byte) (res []byte, err error) {
+	// Catch and return any panics detected during encoding/decoding/rpc.
+	defer func() {
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+		}
+	}()
+
+	// TODO(rgrandl): The deferred function above will recover from panics in the
+	// user code: fix this.
+	// Call the local method.
+	r0, appErr := s.impl.GenerateAuthKey2FA(ctx)
+
+	// Encode the results.
+	enc := codegen.NewEncoder()
+	enc.String(r0)
+	enc.Error(appErr)
+	return enc.Data(), nil
 }
 
 func (s login_server_stub) login(ctx context.Context, args []byte) (res []byte, err error) {
@@ -209,6 +382,33 @@ func (s login_server_stub) login(ctx context.Context, args []byte) (res []byte, 
 	return enc.Data(), nil
 }
 
+func (s login_server_stub) verifyAuthKey2FA(ctx context.Context, args []byte) (res []byte, err error) {
+	// Catch and return any panics detected during encoding/decoding/rpc.
+	defer func() {
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+		}
+	}()
+
+	// Decode arguments.
+	dec := codegen.NewDecoder(args)
+	var a0 string
+	a0 = dec.String()
+	var a1 string
+	a1 = dec.String()
+
+	// TODO(rgrandl): The deferred function above will recover from panics in the
+	// user code: fix this.
+	// Call the local method.
+	r0, appErr := s.impl.VerifyAuthKey2FA(ctx, a0, a1)
+
+	// Encode the results.
+	enc := codegen.NewEncoder()
+	enc.Bool(r0)
+	enc.Error(appErr)
+	return enc.Data(), nil
+}
+
 // Reflect stub implementations.
 
 type login_reflect_stub struct {
@@ -218,7 +418,17 @@ type login_reflect_stub struct {
 // Check that login_reflect_stub implements the Login interface.
 var _ Login = (*login_reflect_stub)(nil)
 
+func (s login_reflect_stub) GenerateAuthKey2FA(ctx context.Context) (r0 string, err error) {
+	err = s.caller("GenerateAuthKey2FA", ctx, []any{}, []any{&r0})
+	return
+}
+
 func (s login_reflect_stub) Login(ctx context.Context, a0 string, a1 string) (r0 bool, err error) {
 	err = s.caller("Login", ctx, []any{a0, a1}, []any{&r0})
+	return
+}
+
+func (s login_reflect_stub) VerifyAuthKey2FA(ctx context.Context, a0 string, a1 string) (r0 bool, err error) {
+	err = s.caller("VerifyAuthKey2FA", ctx, []any{a0, a1}, []any{&r0})
 	return
 }

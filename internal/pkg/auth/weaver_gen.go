@@ -15,51 +15,51 @@ import (
 
 func init() {
 	codegen.Register(codegen.Registration{
-		Name:  "vivianlab/internal/pkg/auth/Auth2FA",
-		Iface: reflect.TypeOf((*Auth2FA)(nil)).Elem(),
-		Impl:  reflect.TypeOf(auth2FA{}),
+		Name:  "vivianlab/internal/pkg/auth/Authenticator",
+		Iface: reflect.TypeOf((*Authenticator)(nil)).Elem(),
+		Impl:  reflect.TypeOf(impl{}),
 		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
-			return auth2FA_local_stub{impl: impl.(Auth2FA), tracer: tracer, generateAuthKey2FAMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/auth/Auth2FA", Method: "GenerateAuthKey2FA", Remote: false}), verifyAuthKey2FAMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/auth/Auth2FA", Method: "VerifyAuthKey2FA", Remote: false})}
+			return authenticator_local_stub{impl: impl.(Authenticator), tracer: tracer, generateAuthKey2FAMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/auth/Authenticator", Method: "GenerateAuthKey2FA", Remote: false}), verifyAuthKey2FAMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/auth/Authenticator", Method: "VerifyAuthKey2FA", Remote: false})}
 		},
 		ClientStubFn: func(stub codegen.Stub, caller string) any {
-			return auth2FA_client_stub{stub: stub, generateAuthKey2FAMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/auth/Auth2FA", Method: "GenerateAuthKey2FA", Remote: true}), verifyAuthKey2FAMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/auth/Auth2FA", Method: "VerifyAuthKey2FA", Remote: true})}
+			return authenticator_client_stub{stub: stub, generateAuthKey2FAMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/auth/Authenticator", Method: "GenerateAuthKey2FA", Remote: true}), verifyAuthKey2FAMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/auth/Authenticator", Method: "VerifyAuthKey2FA", Remote: true})}
 		},
 		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
-			return auth2FA_server_stub{impl: impl.(Auth2FA), addLoad: addLoad}
+			return authenticator_server_stub{impl: impl.(Authenticator), addLoad: addLoad}
 		},
 		ReflectStubFn: func(caller func(string, context.Context, []any, []any) error) any {
-			return auth2FA_reflect_stub{caller: caller}
+			return authenticator_reflect_stub{caller: caller}
 		},
 		RefData: "",
 	})
 }
 
 // weaver.InstanceOf checks.
-var _ weaver.InstanceOf[Auth2FA] = (*auth2FA)(nil)
+var _ weaver.InstanceOf[Authenticator] = (*impl)(nil)
 
 // weaver.Router checks.
-var _ weaver.Unrouted = (*auth2FA)(nil)
+var _ weaver.Unrouted = (*impl)(nil)
 
 // Local stub implementations.
 
-type auth2FA_local_stub struct {
-	impl                      Auth2FA
+type authenticator_local_stub struct {
+	impl                      Authenticator
 	tracer                    trace.Tracer
 	generateAuthKey2FAMetrics *codegen.MethodMetrics
 	verifyAuthKey2FAMetrics   *codegen.MethodMetrics
 }
 
-// Check that auth2FA_local_stub implements the Auth2FA interface.
-var _ Auth2FA = (*auth2FA_local_stub)(nil)
+// Check that authenticator_local_stub implements the Authenticator interface.
+var _ Authenticator = (*authenticator_local_stub)(nil)
 
-func (s auth2FA_local_stub) GenerateAuthKey2FA(ctx context.Context) (r0 string, err error) {
+func (s authenticator_local_stub) GenerateAuthKey2FA(ctx context.Context) (r0 string, err error) {
 	// Update metrics.
 	begin := s.generateAuthKey2FAMetrics.Begin()
 	defer func() { s.generateAuthKey2FAMetrics.End(begin, err != nil, 0, 0) }()
 	span := trace.SpanFromContext(ctx)
 	if span.SpanContext().IsValid() {
 		// Create a child span for this method.
-		ctx, span = s.tracer.Start(ctx, "auth.Auth2FA.GenerateAuthKey2FA", trace.WithSpanKind(trace.SpanKindInternal))
+		ctx, span = s.tracer.Start(ctx, "auth.Authenticator.GenerateAuthKey2FA", trace.WithSpanKind(trace.SpanKindInternal))
 		defer func() {
 			if err != nil {
 				span.RecordError(err)
@@ -72,14 +72,14 @@ func (s auth2FA_local_stub) GenerateAuthKey2FA(ctx context.Context) (r0 string, 
 	return s.impl.GenerateAuthKey2FA(ctx)
 }
 
-func (s auth2FA_local_stub) VerifyAuthKey2FA(ctx context.Context, a0 string, a1 string) (r0 bool, err error) {
+func (s authenticator_local_stub) VerifyAuthKey2FA(ctx context.Context, a0 string, a1 string) (r0 bool, err error) {
 	// Update metrics.
 	begin := s.verifyAuthKey2FAMetrics.Begin()
 	defer func() { s.verifyAuthKey2FAMetrics.End(begin, err != nil, 0, 0) }()
 	span := trace.SpanFromContext(ctx)
 	if span.SpanContext().IsValid() {
 		// Create a child span for this method.
-		ctx, span = s.tracer.Start(ctx, "auth.Auth2FA.VerifyAuthKey2FA", trace.WithSpanKind(trace.SpanKindInternal))
+		ctx, span = s.tracer.Start(ctx, "auth.Authenticator.VerifyAuthKey2FA", trace.WithSpanKind(trace.SpanKindInternal))
 		defer func() {
 			if err != nil {
 				span.RecordError(err)
@@ -94,16 +94,16 @@ func (s auth2FA_local_stub) VerifyAuthKey2FA(ctx context.Context, a0 string, a1 
 
 // Client stub implementations.
 
-type auth2FA_client_stub struct {
+type authenticator_client_stub struct {
 	stub                      codegen.Stub
 	generateAuthKey2FAMetrics *codegen.MethodMetrics
 	verifyAuthKey2FAMetrics   *codegen.MethodMetrics
 }
 
-// Check that auth2FA_client_stub implements the Auth2FA interface.
-var _ Auth2FA = (*auth2FA_client_stub)(nil)
+// Check that authenticator_client_stub implements the Authenticator interface.
+var _ Authenticator = (*authenticator_client_stub)(nil)
 
-func (s auth2FA_client_stub) GenerateAuthKey2FA(ctx context.Context) (r0 string, err error) {
+func (s authenticator_client_stub) GenerateAuthKey2FA(ctx context.Context) (r0 string, err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
 	begin := s.generateAuthKey2FAMetrics.Begin()
@@ -112,7 +112,7 @@ func (s auth2FA_client_stub) GenerateAuthKey2FA(ctx context.Context) (r0 string,
 	span := trace.SpanFromContext(ctx)
 	if span.SpanContext().IsValid() {
 		// Create a child span for this method.
-		ctx, span = s.stub.Tracer().Start(ctx, "auth.Auth2FA.GenerateAuthKey2FA", trace.WithSpanKind(trace.SpanKindClient))
+		ctx, span = s.stub.Tracer().Start(ctx, "auth.Authenticator.GenerateAuthKey2FA", trace.WithSpanKind(trace.SpanKindClient))
 	}
 
 	defer func() {
@@ -150,7 +150,7 @@ func (s auth2FA_client_stub) GenerateAuthKey2FA(ctx context.Context) (r0 string,
 	return
 }
 
-func (s auth2FA_client_stub) VerifyAuthKey2FA(ctx context.Context, a0 string, a1 string) (r0 bool, err error) {
+func (s authenticator_client_stub) VerifyAuthKey2FA(ctx context.Context, a0 string, a1 string) (r0 bool, err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
 	begin := s.verifyAuthKey2FAMetrics.Begin()
@@ -159,7 +159,7 @@ func (s auth2FA_client_stub) VerifyAuthKey2FA(ctx context.Context, a0 string, a1
 	span := trace.SpanFromContext(ctx)
 	if span.SpanContext().IsValid() {
 		// Create a child span for this method.
-		ctx, span = s.stub.Tracer().Start(ctx, "auth.Auth2FA.VerifyAuthKey2FA", trace.WithSpanKind(trace.SpanKindClient))
+		ctx, span = s.stub.Tracer().Start(ctx, "auth.Authenticator.VerifyAuthKey2FA", trace.WithSpanKind(trace.SpanKindClient))
 	}
 
 	defer func() {
@@ -233,16 +233,16 @@ please file an issue at https://github.com/ServiceWeaver/weaver/issues.
 
 // Server stub implementations.
 
-type auth2FA_server_stub struct {
-	impl    Auth2FA
+type authenticator_server_stub struct {
+	impl    Authenticator
 	addLoad func(key uint64, load float64)
 }
 
-// Check that auth2FA_server_stub implements the codegen.Server interface.
-var _ codegen.Server = (*auth2FA_server_stub)(nil)
+// Check that authenticator_server_stub implements the codegen.Server interface.
+var _ codegen.Server = (*authenticator_server_stub)(nil)
 
 // GetStubFn implements the codegen.Server interface.
-func (s auth2FA_server_stub) GetStubFn(method string) func(ctx context.Context, args []byte) ([]byte, error) {
+func (s authenticator_server_stub) GetStubFn(method string) func(ctx context.Context, args []byte) ([]byte, error) {
 	switch method {
 	case "GenerateAuthKey2FA":
 		return s.generateAuthKey2FA
@@ -253,7 +253,7 @@ func (s auth2FA_server_stub) GetStubFn(method string) func(ctx context.Context, 
 	}
 }
 
-func (s auth2FA_server_stub) generateAuthKey2FA(ctx context.Context, args []byte) (res []byte, err error) {
+func (s authenticator_server_stub) generateAuthKey2FA(ctx context.Context, args []byte) (res []byte, err error) {
 	// Catch and return any panics detected during encoding/decoding/rpc.
 	defer func() {
 		if err == nil {
@@ -273,7 +273,7 @@ func (s auth2FA_server_stub) generateAuthKey2FA(ctx context.Context, args []byte
 	return enc.Data(), nil
 }
 
-func (s auth2FA_server_stub) verifyAuthKey2FA(ctx context.Context, args []byte) (res []byte, err error) {
+func (s authenticator_server_stub) verifyAuthKey2FA(ctx context.Context, args []byte) (res []byte, err error) {
 	// Catch and return any panics detected during encoding/decoding/rpc.
 	defer func() {
 		if err == nil {
@@ -302,19 +302,19 @@ func (s auth2FA_server_stub) verifyAuthKey2FA(ctx context.Context, args []byte) 
 
 // Reflect stub implementations.
 
-type auth2FA_reflect_stub struct {
+type authenticator_reflect_stub struct {
 	caller func(string, context.Context, []any, []any) error
 }
 
-// Check that auth2FA_reflect_stub implements the Auth2FA interface.
-var _ Auth2FA = (*auth2FA_reflect_stub)(nil)
+// Check that authenticator_reflect_stub implements the Authenticator interface.
+var _ Authenticator = (*authenticator_reflect_stub)(nil)
 
-func (s auth2FA_reflect_stub) GenerateAuthKey2FA(ctx context.Context) (r0 string, err error) {
+func (s authenticator_reflect_stub) GenerateAuthKey2FA(ctx context.Context) (r0 string, err error) {
 	err = s.caller("GenerateAuthKey2FA", ctx, []any{}, []any{&r0})
 	return
 }
 
-func (s auth2FA_reflect_stub) VerifyAuthKey2FA(ctx context.Context, a0 string, a1 string) (r0 bool, err error) {
+func (s authenticator_reflect_stub) VerifyAuthKey2FA(ctx context.Context, a0 string, a1 string) (r0 bool, err error) {
 	err = s.caller("VerifyAuthKey2FA", ctx, []any{a0, a1}, []any{&r0})
 	return
 }

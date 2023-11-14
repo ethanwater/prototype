@@ -16,7 +16,7 @@ async function loginResponse(endpoint, email, password, aborter) {
 }
 
 async function fetchKey(endpoint, aborter) {
-    const response = await fetch(`/${endpoint}`, {
+    const response = await fetch(`/login/${endpoint}`, {
         signal: aborter
     });
     const text = await response.text();
@@ -28,7 +28,7 @@ async function fetchKey(endpoint, aborter) {
 }
 
 async function verifyCode(endpoint, hash, input, aborter) {
-    const response = await fetch(`/${endpoint}?hash=${encodeURIComponent(hash)}&input=${encodeURIComponent(input)}`, {
+    const response = await fetch(`/login/${endpoint}?hash=${encodeURIComponent(hash)}&input=${encodeURIComponent(input)}`, {
         signal: aborter.signal,
     });
     const text = await response.text();

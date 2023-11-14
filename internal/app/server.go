@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"sync"
 	"vivianlab/database"
-	"vivianlab/internal/pkg/auth"
 	"vivianlab/internal/pkg/echo"
 	"vivianlab/internal/pkg/login"
 	"vivianlab/web"
@@ -21,10 +20,9 @@ const Timeout = 10 * time.Second
 
 type App struct {
 	weaver.Implements[weaver.Main]
-	listener      weaver.Listener `weaver:"vivian"`
-	echo          weaver.Ref[echo.Echo]
-	login         weaver.Ref[login.Login]
-	twoFactorAuth weaver.Ref[auth.Auth2FA]
+	listener weaver.Listener `weaver:"vivian"`
+	echo     weaver.Ref[echo.Echoer]
+	login    weaver.Ref[login.Login]
 
 	rw_timeout time.Duration
 	mux        sync.Mutex
@@ -61,8 +59,8 @@ func Deploy(ctx context.Context, app *App) error {
 	appHandler.Handle("/echo", EchoResponse(ctx, app))
 	appHandler.Handle("/fetch", FetchUsers(ctx, app))
 	appHandler.Handle("/login", weaver.InstrumentHandler("login", AccountLogin(ctx, app)))
-	appHandler.Handle("/generatekey", GenerateTwoFactorAuth(ctx, app))
-	appHandler.Handle("/verifykey", VerifyTwoFactorAuth(ctx, app))
+	appHandler.Handle("/login/generatekey", GenerateTwoFactorAuth(ctx, app))
+	appHandler.Handle("/login/verifykey", VerifyTwoFactorAuth(ctx, app))
 	appHandler.HandleFunc(weaver.HealthzURL, weaver.HealthzHandler)
 
 	return http.Serve(app.listener, app.handler)

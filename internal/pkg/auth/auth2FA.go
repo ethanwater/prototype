@@ -31,16 +31,16 @@ const (
 // The generated key will be hashed and stored via localStorage in JavaScript
 // and should be removed from localStorage cache once verified.
 
-type Auth2FA interface {
+type Authenticator interface {
 	GenerateAuthKey2FA(context.Context) (string, error)
 	VerifyAuthKey2FA(context.Context, string, string) (bool, error)
 }
 
-type auth2FA struct {
-	weaver.Implements[Auth2FA]
+type impl struct {
+	weaver.Implements[Authenticator]
 }
 
-func (t *auth2FA) GenerateAuthKey2FA(ctx context.Context) (string, error) {
+func (t *impl) GenerateAuthKey2FA(ctx context.Context) (string, error) {
 	log := t.Logger(ctx)
 
 	var mu sync.Mutex
@@ -63,22 +63,27 @@ func (t *auth2FA) GenerateAuthKey2FA(ctx context.Context) (string, error) {
 	//}
 
 	fmt.Println(authKey.String())
-	authKeyHash, error := HashPassword(authKey.String())
+	authKeyHash, error := HashPassword(ctx, authKey.String())
 
 	log.Debug("vivian: STATUS!", "authentication key generated", http.StatusOK)
 	return authKeyHash, error
 }
 
-func (t *auth2FA) VerifyAuthKey2FA(ctx context.Context, authkey_hash, input string) (bool, error) {
-	log := t.Logger(ctx)
+func (t *impl) VerifyAuthKey2FA(ctx context.Context, authkey_hash, input string) (bool, error) {
 	var mu sync.Mutex
 	mu.Lock()
 	defer mu.Unlock()
 
-	log.Debug("vivian: STATUS!", "action", "verifying input...")
+	t.Logger(ctx).Debug("vivian: STATUS!", "action", "verifying input...")
 	if SanitizeCheck(input) {
 		status := bcrypt.CompareHashAndPassword([]byte(authkey_hash), []byte(input))
-		return status == nil, status
+		if status != nil {
+			t.Logger(ctx).Debug("vivian: WARNING!", "key invalid", http.StatusNotAcceptable)
+			return status == nil, status
+		} else {
+			t.Logger(ctx).Debug("vivian: SUCCESS!", "key verified", status == nil, "status", http.StatusOK)
+			return status == nil, status
+		}
 	}
 
 	return false, nil

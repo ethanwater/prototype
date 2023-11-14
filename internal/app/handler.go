@@ -16,23 +16,22 @@ func Split(r rune) bool {
 
 func GenerateTwoFactorAuth(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authkey, err := app.twoFactorAuth.Get().GenerateAuthKey2FA(ctx)
+		authkey, err := app.login.Get().GenerateAuthKey2FA(ctx)
 		if err != nil {
 			//https://go.dev/src/net/http/status.go
-			app.Logger(ctx).Error("vivian: ERROR!", "failure generate authentication key", http.StatusBadRequest)
+			app.Logger(ctx).Error("vivian: ERROR", "failure generating authentication key", http.StatusBadRequest)
 			//GenerateTwoFactorAuth(ctx, app) //may cause a race, TODO: check this line out
 			return
 		}
-		app.Logger(ctx).Debug("vivian: SUCCESS!", "authentication key recieved", http.StatusOK)
 
 		bytes, err := json.Marshal(authkey)
 		if err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR! failure marshalling resullts", "err", err)
+			app.Logger(r.Context()).Error("vivian: ERROR", "failure marshalling resullts", "err", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR! failure writing search results", "err", err)
+			app.Logger(r.Context()).Error("vivian: ERROR", "failure writing search results", err)
 		}
 	})
 }
@@ -43,24 +42,19 @@ func VerifyTwoFactorAuth(ctx context.Context, app *App) http.Handler {
 		hash := strings.TrimSpace(q.Get("hash"))
 		input := strings.TrimSpace(q.Get("input"))
 
-		result, err := app.twoFactorAuth.Get().VerifyAuthKey2FA(ctx, hash, input)
+		result, err := app.login.Get().VerifyAuthKey2FA(ctx, hash, input)
 		if err != nil {
 			app.Logger(ctx).Error("vivian: ERROR!", "unable to verify input", http.StatusNotAcceptable)
-		}
-		if !result {
-			app.Logger(ctx).Debug("vivian: WARNING!", "key invalid", http.StatusNotAcceptable)
-		} else {
-			app.Logger(ctx).Debug("vivian: SUCCESS!", "key verified", result, "status", http.StatusOK)
 		}
 
 		bytes, err := json.Marshal(result)
 		if err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR! failure marshalling resullts", "err", err)
+			app.Logger(r.Context()).Error("vivian: ERROR!", "failure marshalling resullts", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR! failure writing search results", "err", err)
+			app.Logger(r.Context()).Error("vivian: ERROR!", "failure writing search results", err)
 		}
 	})
 }

@@ -11,14 +11,17 @@ import (
 
 type Login interface {
 	Login(context.Context, string, string) (bool, error)
+	GenerateAuthKey2FA(context.Context) (string, error)
+	VerifyAuthKey2FA(context.Context, string, string) (bool, error)
 }
 
-type login struct {
+type impl struct {
 	weaver.Implements[Login]
+	tfa weaver.Ref[auth.Authenticator]
 }
 
-func (l *login) Login(ctx context.Context, email string, password string) (bool, error) {
-	//TODO: count login attempts. OK on JS end, but can still be curled via term
+func (l *impl) Login(ctx context.Context, email string, password string) (bool, error) {
+	//TODO: count impl attempts. OK on JS end, but can still be curled via term
 	log := l.Logger(ctx)
 
 	if !auth.SanitizeEmailCheck(email) {
@@ -46,4 +49,16 @@ func (l *login) Login(ctx context.Context, email string, password string) (bool,
 		log.Error("vivian: ERROR! invalid credentials", "err", http.StatusBadRequest)
 		return false, nil
 	}
+}
+
+func (l *impl) GenerateAuthKey2FA(ctx context.Context) (string, error) {
+	authkey, err := l.tfa.Get().GenerateAuthKey2FA(ctx)
+
+	return authkey, err
+}
+
+func (l *impl) VerifyAuthKey2FA(ctx context.Context, authkey_hash, input string) (bool, error) {
+	result, err := l.tfa.Get().VerifyAuthKey2FA(ctx, authkey_hash, input)
+
+	return result, err
 }

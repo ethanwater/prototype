@@ -15,50 +15,50 @@ import (
 
 func init() {
 	codegen.Register(codegen.Registration{
-		Name:  "vivianlab/internal/pkg/echo/Echo",
-		Iface: reflect.TypeOf((*Echo)(nil)).Elem(),
-		Impl:  reflect.TypeOf(echo{}),
+		Name:  "vivianlab/internal/pkg/echo/Echoer",
+		Iface: reflect.TypeOf((*Echoer)(nil)).Elem(),
+		Impl:  reflect.TypeOf(impl{}),
 		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
-			return echo_local_stub{impl: impl.(Echo), tracer: tracer, echoResponseMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/echo/Echo", Method: "EchoResponse", Remote: false})}
+			return echoer_local_stub{impl: impl.(Echoer), tracer: tracer, echoResponseMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/echo/Echoer", Method: "EchoResponse", Remote: false})}
 		},
 		ClientStubFn: func(stub codegen.Stub, caller string) any {
-			return echo_client_stub{stub: stub, echoResponseMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/echo/Echo", Method: "EchoResponse", Remote: true})}
+			return echoer_client_stub{stub: stub, echoResponseMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/internal/pkg/echo/Echoer", Method: "EchoResponse", Remote: true})}
 		},
 		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
-			return echo_server_stub{impl: impl.(Echo), addLoad: addLoad}
+			return echoer_server_stub{impl: impl.(Echoer), addLoad: addLoad}
 		},
 		ReflectStubFn: func(caller func(string, context.Context, []any, []any) error) any {
-			return echo_reflect_stub{caller: caller}
+			return echoer_reflect_stub{caller: caller}
 		},
 		RefData: "",
 	})
 }
 
 // weaver.InstanceOf checks.
-var _ weaver.InstanceOf[Echo] = (*echo)(nil)
+var _ weaver.InstanceOf[Echoer] = (*impl)(nil)
 
 // weaver.Router checks.
-var _ weaver.Unrouted = (*echo)(nil)
+var _ weaver.Unrouted = (*impl)(nil)
 
 // Local stub implementations.
 
-type echo_local_stub struct {
-	impl                Echo
+type echoer_local_stub struct {
+	impl                Echoer
 	tracer              trace.Tracer
 	echoResponseMetrics *codegen.MethodMetrics
 }
 
-// Check that echo_local_stub implements the Echo interface.
-var _ Echo = (*echo_local_stub)(nil)
+// Check that echoer_local_stub implements the Echoer interface.
+var _ Echoer = (*echoer_local_stub)(nil)
 
-func (s echo_local_stub) EchoResponse(ctx context.Context, a0 string) (err error) {
+func (s echoer_local_stub) EchoResponse(ctx context.Context, a0 string) (err error) {
 	// Update metrics.
 	begin := s.echoResponseMetrics.Begin()
 	defer func() { s.echoResponseMetrics.End(begin, err != nil, 0, 0) }()
 	span := trace.SpanFromContext(ctx)
 	if span.SpanContext().IsValid() {
 		// Create a child span for this method.
-		ctx, span = s.tracer.Start(ctx, "echo.Echo.EchoResponse", trace.WithSpanKind(trace.SpanKindInternal))
+		ctx, span = s.tracer.Start(ctx, "echo.Echoer.EchoResponse", trace.WithSpanKind(trace.SpanKindInternal))
 		defer func() {
 			if err != nil {
 				span.RecordError(err)
@@ -73,15 +73,15 @@ func (s echo_local_stub) EchoResponse(ctx context.Context, a0 string) (err error
 
 // Client stub implementations.
 
-type echo_client_stub struct {
+type echoer_client_stub struct {
 	stub                codegen.Stub
 	echoResponseMetrics *codegen.MethodMetrics
 }
 
-// Check that echo_client_stub implements the Echo interface.
-var _ Echo = (*echo_client_stub)(nil)
+// Check that echoer_client_stub implements the Echoer interface.
+var _ Echoer = (*echoer_client_stub)(nil)
 
-func (s echo_client_stub) EchoResponse(ctx context.Context, a0 string) (err error) {
+func (s echoer_client_stub) EchoResponse(ctx context.Context, a0 string) (err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
 	begin := s.echoResponseMetrics.Begin()
@@ -90,7 +90,7 @@ func (s echo_client_stub) EchoResponse(ctx context.Context, a0 string) (err erro
 	span := trace.SpanFromContext(ctx)
 	if span.SpanContext().IsValid() {
 		// Create a child span for this method.
-		ctx, span = s.stub.Tracer().Start(ctx, "echo.Echo.EchoResponse", trace.WithSpanKind(trace.SpanKindClient))
+		ctx, span = s.stub.Tracer().Start(ctx, "echo.Echoer.EchoResponse", trace.WithSpanKind(trace.SpanKindClient))
 	}
 
 	defer func() {
@@ -161,16 +161,16 @@ please file an issue at https://github.com/ServiceWeaver/weaver/issues.
 
 // Server stub implementations.
 
-type echo_server_stub struct {
-	impl    Echo
+type echoer_server_stub struct {
+	impl    Echoer
 	addLoad func(key uint64, load float64)
 }
 
-// Check that echo_server_stub implements the codegen.Server interface.
-var _ codegen.Server = (*echo_server_stub)(nil)
+// Check that echoer_server_stub implements the codegen.Server interface.
+var _ codegen.Server = (*echoer_server_stub)(nil)
 
 // GetStubFn implements the codegen.Server interface.
-func (s echo_server_stub) GetStubFn(method string) func(ctx context.Context, args []byte) ([]byte, error) {
+func (s echoer_server_stub) GetStubFn(method string) func(ctx context.Context, args []byte) ([]byte, error) {
 	switch method {
 	case "EchoResponse":
 		return s.echoResponse
@@ -179,7 +179,7 @@ func (s echo_server_stub) GetStubFn(method string) func(ctx context.Context, arg
 	}
 }
 
-func (s echo_server_stub) echoResponse(ctx context.Context, args []byte) (res []byte, err error) {
+func (s echoer_server_stub) echoResponse(ctx context.Context, args []byte) (res []byte, err error) {
 	// Catch and return any panics detected during encoding/decoding/rpc.
 	defer func() {
 		if err == nil {
@@ -205,14 +205,14 @@ func (s echo_server_stub) echoResponse(ctx context.Context, args []byte) (res []
 
 // Reflect stub implementations.
 
-type echo_reflect_stub struct {
+type echoer_reflect_stub struct {
 	caller func(string, context.Context, []any, []any) error
 }
 
-// Check that echo_reflect_stub implements the Echo interface.
-var _ Echo = (*echo_reflect_stub)(nil)
+// Check that echoer_reflect_stub implements the Echoer interface.
+var _ Echoer = (*echoer_reflect_stub)(nil)
 
-func (s echo_reflect_stub) EchoResponse(ctx context.Context, a0 string) (err error) {
+func (s echoer_reflect_stub) EchoResponse(ctx context.Context, a0 string) (err error) {
 	err = s.caller("EchoResponse", ctx, []any{a0}, []any{})
 	return
 }
