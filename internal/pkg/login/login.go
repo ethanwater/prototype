@@ -7,6 +7,18 @@ import (
 	"vivianlab/internal/pkg/auth"
 
 	"github.com/ServiceWeaver/weaver"
+	"github.com/ServiceWeaver/weaver/metrics"
+)
+
+var (
+	totalSuccessfulAccountLogins = metrics.NewCounter(
+		"totalSuccesfulAccountLogins",
+		"the total number of times impl.Login is called and succesfully retrieves an account",
+	)
+	totalFailedAccountLogins = metrics.NewCounter(
+		"totalFailedAccountLogins",
+		"the total number of times impl.Login is called and fails retrieving an account",
+	)
 )
 
 type Login interface {
@@ -43,9 +55,11 @@ func (l *impl) Login(ctx context.Context, email string, password string) (bool, 
 
 	//DAMN! this VerifyHash takes a while
 	if email == fetchedAccount.Email && auth.VerfiyHashPassword(fetchedAccount.Password, password) {
+		totalSuccessfulAccountLogins.Inc()
 		log.Debug("vivian: SUCCESS! fetched account: ", "alias", fetchedAccount.Alias)
 		return true, nil
 	} else {
+		totalFailedAccountLogins.Inc()
 		log.Error("vivian: ERROR! invalid credentials", "err", http.StatusBadRequest)
 		return false, nil
 	}

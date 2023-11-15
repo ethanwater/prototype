@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/ServiceWeaver/weaver"
+	"github.com/ServiceWeaver/weaver/metrics"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -19,13 +20,25 @@ const (
 	authKeySize int    = 5
 )
 
-// Receiver Config
-type ReceiverType int
+var (
+	generatedAuthKeys = metrics.NewCounter(
+		"generatedAuthKeys",
+		"total number of generated authentication keys",
+	)
 
-const (
-	Email ReceiverType = iota + 1
-	Mobile
+	validAuthKeys = metrics.NewCounter(
+		"validAuthKeys",
+		"totoal number of successfully matching keys",
+	)
 )
+
+// Receiver Config
+//type ReceiverType int
+//
+//const (
+//	Email ReceiverType = iota + 1
+//	Mobile
+//)
 
 // GenerateAuthKey2FA generates a 2FA authentication key.
 // The generated key will be hashed and stored via localStorage in JavaScript
@@ -65,6 +78,7 @@ func (t *impl) GenerateAuthKey2FA(ctx context.Context) (string, error) {
 	fmt.Println(authKey.String())
 	authKeyHash, error := HashPassword(ctx, authKey.String())
 
+	generatedAuthKeys.Inc()
 	log.Debug("vivian: STATUS!", "authentication key generated", http.StatusOK)
 	return authKeyHash, error
 }
@@ -80,6 +94,7 @@ func (t *impl) VerifyAuthKey2FA(ctx context.Context, authkey_hash, input string)
 			t.Logger(ctx).Debug("vivian: WARNING!", "key invalid", http.StatusNotAcceptable)
 			return status == nil, status
 		} else {
+			validAuthKeys.Inc()
 			t.Logger(ctx).Debug("vivian: SUCCESS!", "key verified", status == nil, "status", http.StatusOK)
 			return status == nil, status
 		}
