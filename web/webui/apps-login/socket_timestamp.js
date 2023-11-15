@@ -1,4 +1,4 @@
-var socket = new WebSocket("ws://localhost:2695/ws", "protocolOne");
+var socket = new WebSocket("wss://localhost:2695/ws", "protocolOne");
 
 socket.onopen = function(event) {
     console.log("WebSocket connection established.");

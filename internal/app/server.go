@@ -65,6 +65,8 @@ func Deploy(ctx context.Context, app *App) error {
 	appHandler.Handle("/login/verifykey", VerifyTwoFactorAuth(ctx, app))
 	appHandler.HandleFunc(weaver.HealthzURL, weaver.HealthzHandler)
 	appHandler.Handle("/ws", HandleWebSocketTimestamp(ctx, app))
-
-	return http.Serve(app.listener, app.handler)
+	
+	//TODO: cant access webapp using ServeTLS on Multiprocess!
+	return http.ServeTLS(app.listener, app.handler, "../../certificates/server.crt", "../../certificates/server.key")
+	//return http.Serve(app.listener, app.handler)
 }

@@ -18,9 +18,9 @@ func HandleWebSocketTimestamp(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			app.Logger(ctx).Error("vivian: socket:", "upgrade fail", err)
+			app.Logger(ctx).Error("vivian: socket: handshake failure", "err", "connection refused")
 		} else {
-			app.Logger(ctx).Info("vivian: socket: handshake success")
+			app.Logger(ctx).Info("vivian: socket: handshake success", "remote", conn.RemoteAddr(), "local", conn.LocalAddr())
 		}
 		defer conn.Close()
 
