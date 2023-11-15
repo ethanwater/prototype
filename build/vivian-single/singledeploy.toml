@@ -5,4 +5,4 @@ version = "alpha v2.0.1"
 binary = "vivian-single"
 
 [single]
-listeners.vivian = {address = "localhost:1305"}
+listeners.vivian = {address = "localhost:2695"}

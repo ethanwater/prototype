@@ -56,12 +56,13 @@ func Deploy(ctx context.Context, app *App) error {
 	//TODO: addiiton middleware to verify that the request is safe
 	//TODO: test all curl commands to verify the data the user recieves
 	appHandler.Handle("/", http.StripPrefix("/", http.FileServer(http.FS(web.WebUI))))
-	appHandler.Handle("/echo", EchoResponse(ctx, app))
-	appHandler.Handle("/fetch", FetchUsers(ctx, app))
+	//appHandler.Handle("/echo", EchoResponse(ctx, app))
+	//appHandler.Handle("/fetch", FetchUsers(ctx, app))
 	appHandler.Handle("/login", weaver.InstrumentHandler("login", AccountLogin(ctx, app)))
 	appHandler.Handle("/login/generatekey", GenerateTwoFactorAuth(ctx, app))
 	appHandler.Handle("/login/verifykey", VerifyTwoFactorAuth(ctx, app))
 	appHandler.HandleFunc(weaver.HealthzURL, weaver.HealthzHandler)
+	appHandler.Handle("/ws", HandleWebSocketTimestamp(ctx, app))
 
 	return http.Serve(app.listener, app.handler)
 }

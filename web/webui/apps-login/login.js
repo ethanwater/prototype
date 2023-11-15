@@ -1,6 +1,6 @@
-import {
-    strip
-} from "../apps-echo/echo.js";
+function strip(s) {
+    return s.replace(/\s+/g, '');
+}
 
 async function loginResponse(endpoint, email, password, aborter) {
     const response = await fetch(`/${endpoint}?q=${encodeURIComponent(email)}&p=${encodeURIComponent(password)}`, {
@@ -130,7 +130,6 @@ function main() {
     const email = document.getElementById('email');
     const enterButton = document.getElementById('enter');
     const showButton = document.getElementById('show_hide');
-    const codeButton = document.getElementById('codeEnter');
     const inputs = document.querySelectorAll('input');
 
     let controller;
@@ -272,8 +271,9 @@ function main() {
     showButton.addEventListener('click', showPassword);
 }
 
-document.addEventListener('DOMContentLoaded', main);
-
+document.addEventListener('DOMContentLoaded', () => {
+    main(); // Invoke the main function
+});
 //window.onload = function() {
 //    const email = document.getElementById('email');
 //    email.value = localStorage.getItem('email');
