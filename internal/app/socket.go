@@ -19,12 +19,15 @@ func HandleWebSocketTimestamp(ctx context.Context, app *App) http.Handler {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			app.Logger(ctx).Error("vivian: socket:", "upgrade fail", err)
+		} else {
+			app.utils.Get().LoggerSocket(ctx)
 		}
 		defer conn.Close()
 
 		for {
 			// Sending a timestamp to the client every second
-			err := conn.WriteMessage(websocket.TextMessage, []byte(time.Now().Format(time.RFC3339)))
+			rn, _ := app.utils.Get().Time(ctx)
+			err := conn.WriteMessage(websocket.TextMessage, rn)
 			if err != nil {
 				app.Logger(ctx).Error("vivian: socket:", err)
 				break

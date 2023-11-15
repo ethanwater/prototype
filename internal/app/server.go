@@ -7,6 +7,7 @@ import (
 	"vivianlab/database"
 	"vivianlab/internal/pkg/echo"
 	"vivianlab/internal/pkg/login"
+	"vivianlab/internal/pkg/utils"
 	"vivianlab/web"
 
 	"net/http"
@@ -23,6 +24,7 @@ type App struct {
 	listener weaver.Listener `weaver:"vivian"`
 	echo     weaver.Ref[echo.Echoer]
 	login    weaver.Ref[login.Login]
+	utils    weaver.Ref[utils.T]
 
 	rw_timeout time.Duration
 	mux        sync.Mutex
