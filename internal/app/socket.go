@@ -20,19 +20,41 @@ func HandleWebSocketTimestamp(ctx context.Context, app *App) http.Handler {
 		if err != nil {
 			app.Logger(ctx).Error("vivian: socket:", "upgrade fail", err)
 		} else {
-			app.utils.Get().LoggerSocket(ctx)
+			app.Logger(ctx).Info("vivian: socket: handshake success")
 		}
 		defer conn.Close()
 
-		for {
-			// Sending a timestamp to the client every second
-			rn, _ := app.utils.Get().Time(ctx)
-			err := conn.WriteMessage(websocket.TextMessage, rn)
-			if err != nil {
-				app.Logger(ctx).Error("vivian: socket:", err)
-				break
+		reconnectChannel := make(chan struct{})
+		defer close(reconnectChannel)
+
+		go func() {
+			for {
+				select {
+				case <-reconnectChannel:
+					app.utils.Get().LoggerSocket(ctx, "vivian: socket: reconnected")
+					return
+				case <-ctx.Done():
+					app.Logger(ctx).Error("vivian: socket: disconnected", "err", "context lost")
+					return
+				}
 			}
-			time.Sleep(time.Second)
+		}()
+
+		for {
+			select {
+			case <-ctx.Done():
+				app.Logger(ctx).Error("vivian: socket: disconnected", "err", "context lost")
+				return
+			default:
+				rn, _ := app.utils.Get().Time(ctx)
+				err := conn.WriteMessage(websocket.TextMessage, rn)
+				if err != nil {
+					reconnectChannel <- struct{}{}
+					app.utils.Get().LoggerSocket(ctx, "vivian: socket: disconnected <- broken pipe ?")
+					return
+				}
+				time.Sleep(time.Second)
+			}
 		}
 	})
 }

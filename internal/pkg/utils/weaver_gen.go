@@ -52,7 +52,7 @@ type t_local_stub struct {
 // Check that t_local_stub implements the T interface.
 var _ T = (*t_local_stub)(nil)
 
-func (s t_local_stub) LoggerSocket(ctx context.Context) (err error) {
+func (s t_local_stub) LoggerSocket(ctx context.Context, a0 string) (err error) {
 	// Update metrics.
 	begin := s.loggerSocketMetrics.Begin()
 	defer func() { s.loggerSocketMetrics.End(begin, err != nil, 0, 0) }()
@@ -69,7 +69,7 @@ func (s t_local_stub) LoggerSocket(ctx context.Context) (err error) {
 		}()
 	}
 
-	return s.impl.LoggerSocket(ctx)
+	return s.impl.LoggerSocket(ctx, a0)
 }
 
 func (s t_local_stub) Time(ctx context.Context) (r0 []byte, err error) {
@@ -103,7 +103,7 @@ type t_client_stub struct {
 // Check that t_client_stub implements the T interface.
 var _ T = (*t_client_stub)(nil)
 
-func (s t_client_stub) LoggerSocket(ctx context.Context) (err error) {
+func (s t_client_stub) LoggerSocket(ctx context.Context, a0 string) (err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
 	begin := s.loggerSocketMetrics.Begin()
@@ -132,11 +132,20 @@ func (s t_client_stub) LoggerSocket(ctx context.Context) (err error) {
 
 	}()
 
+	// Preallocate a buffer of the right size.
+	size := 0
+	size += (4 + len(a0))
+	enc := codegen.NewEncoder()
+	enc.Reset(size)
+
+	// Encode arguments.
+	enc.String(a0)
 	var shardKey uint64
 
 	// Call the remote method.
+	requestBytes = len(enc.Data())
 	var results []byte
-	results, err = s.stub.Run(ctx, 0, nil, shardKey)
+	results, err = s.stub.Run(ctx, 0, enc.Data(), shardKey)
 	replyBytes = len(results)
 	if err != nil {
 		err = errors.Join(weaver.RemoteCallError, err)
@@ -249,10 +258,15 @@ func (s t_server_stub) loggerSocket(ctx context.Context, args []byte) (res []byt
 		}
 	}()
 
+	// Decode arguments.
+	dec := codegen.NewDecoder(args)
+	var a0 string
+	a0 = dec.String()
+
 	// TODO(rgrandl): The deferred function above will recover from panics in the
 	// user code: fix this.
 	// Call the local method.
-	appErr := s.impl.LoggerSocket(ctx)
+	appErr := s.impl.LoggerSocket(ctx, a0)
 
 	// Encode the results.
 	enc := codegen.NewEncoder()
@@ -289,8 +303,8 @@ type t_reflect_stub struct {
 // Check that t_reflect_stub implements the T interface.
 var _ T = (*t_reflect_stub)(nil)
 
-func (s t_reflect_stub) LoggerSocket(ctx context.Context) (err error) {
-	err = s.caller("LoggerSocket", ctx, []any{}, []any{})
+func (s t_reflect_stub) LoggerSocket(ctx context.Context, a0 string) (err error) {
+	err = s.caller("LoggerSocket", ctx, []any{a0}, []any{})
 	return
 }
 

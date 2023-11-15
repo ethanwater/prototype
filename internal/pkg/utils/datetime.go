@@ -9,15 +9,15 @@ import (
 
 type T interface {
 	Time(context.Context) ([]byte, error)
-	LoggerSocket(context.Context) error
+	LoggerSocket(context.Context, string)  error
 }
 
 type impl struct {
 	weaver.Implements[T]
 }
 
-func (i *impl) LoggerSocket(ctx context.Context) error {
-	i.Logger(ctx).Debug("vivian: socket: connected")
+func (i *impl) LoggerSocket(ctx context.Context, log string) error {
+	i.Logger(ctx).Debug(log)
 	return nil
 }
 
