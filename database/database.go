@@ -4,88 +4,72 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
-	"vivianlab/models"
+	"log"
 
-	"github.com/go-sql-driver/mysql"
+	"github.com/ServiceWeaver/weaver"
+	_ "github.com/go-sql-driver/mysql"
 )
 
-const name = "vivian_users"
-const address = "127.0.0.1:3306"
-
-func EstablishLinkDatabase(ctx context.Context) (*sql.DB, error) {
-	database := FetchDatabase(ctx)
-
-	ping := database.Ping()
-	if ping != nil {
-		return database, ping
-	}
-
-	return database, nil
+type Database interface {
+	Init(context.Context) error
+	FetchAccount(context.Context, string) (Account, error)
 }
 
-func FetchDatabase(ctx context.Context) *sql.DB {
-	config := mysql.Config{
-		User:   "root",
-		Net:    "tcp",
-		Addr:   address,
-		DBName: name,
-	}
+type impl struct {
+	weaver.Implements[Database]
+	weaver.WithConfig[config]
 
-	database, err := sql.Open("mysql", config.FormatDSN())
-	if err != nil {
-		os.Exit(1)
-	}
-
-	return database
+	db *sql.DB
 }
 
-func FetchDatabaseData(ctx context.Context) ([]models.Account, error) {
-	database := FetchDatabase(ctx)
-
-	rows, err := database.Query("SELECT * FROM users")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	// An album slice to hold data from returned rows.
-	var accounts []models.Account
-
-	// Loop through rows, using Scan to assign column data to struct fields.
-	for rows.Next() {
-		var acc models.Account
-		if err := rows.Scan(&acc.ID, &acc.Alias, &acc.Name, &acc.Email, &acc.Password, &acc.Tier); err != nil {
-			return accounts, err
-		}
-		accounts = append(accounts, acc)
-	}
-	if err = rows.Err(); err != nil {
-		return accounts, err
-	}
-	return accounts, nil
+type config struct {
+	Driver string
+	Source string
 }
 
-func FetchAccount(ctx context.Context, email string) (models.Account, error) {
-	database := FetchDatabase(ctx)
+const MaxIdleConns, MaxOpenConns = 10, 20
 
-	// Use a prepared statement
-	stmt, err := database.Prepare("SELECT * FROM users WHERE email = ?")
+func (s *impl) Init(ctx context.Context) error {
+	database, _ := sql.Open(s.Config().Driver, s.Config().Source)
+	s.db = database
+	s.db.SetMaxIdleConns(MaxIdleConns); s.db.SetMaxOpenConns(MaxOpenConns)
+	s.Logger(ctx).Debug("vivian: [launch] mysql", "connection", s.db.Ping() == nil)
+
+	return s.db.Ping()
+}
+
+type Account struct {
+	weaver.AutoMarshal
+	ID       int
+	Alias    string
+	Name     string
+	Email    string
+	Password string
+	Tier     int
+}
+
+func (s *impl) FetchAccount(_ context.Context, email string) (Account, error) {
+	var acc Account
+	_, err := s.db.Exec("USE vivian_users")
 	if err != nil {
-		return models.Account{}, fmt.Errorf("failed to prepare statement: %w", err)
+		log.Fatal("Error selecting database:", err)
+	}
+
+	stmt, err := s.db.Prepare("SELECT * FROM users WHERE email = ?")
+	if err != nil {
+		return Account{}, fmt.Errorf("failed to prepare statement: %w", err)
 	}
 	defer stmt.Close()
 
-	var acc models.Account
 	// Execute the prepared statement with the email parameter
 	err = stmt.QueryRow(email).Scan(&acc.ID, &acc.Alias, &acc.Name, &acc.Email, &acc.Password, &acc.Tier)
 	if err != nil {
 		// Handle the error appropriately
 		if err == sql.ErrNoRows {
 			// No rows found, return a specific error or handle it accordingly
-			return models.Account{}, fmt.Errorf("no account found for email: %w", err)
+			return Account{}, fmt.Errorf("no account found for email: %w", err)
 		}
-		return models.Account{}, fmt.Errorf("failed to fetch account: %w", err)
+		return Account{}, fmt.Errorf("failed to fetch account: %w", err)
 	}
 	return acc, nil
 }

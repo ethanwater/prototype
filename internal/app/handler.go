@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-
-	"vivianlab/database"
 )
 
 func Split(r rune) bool {
@@ -19,19 +17,19 @@ func GenerateTwoFactorAuth(ctx context.Context, app *App) http.Handler {
 		authkey, err := app.login.Get().GenerateAuthKey2FA(ctx)
 		if err != nil {
 			//https://go.dev/src/net/http/status.go
-			app.Logger(ctx).Error("vivian: ERROR", "failure generating authentication key", http.StatusBadRequest)
+			app.Logger(ctx).Error("vivian: [error]", "failure generating authentication key", http.StatusBadRequest)
 			//GenerateTwoFactorAuth(ctx, app) //may cause a race, TODO: check this line out
 			return
 		}
 
 		bytes, err := json.Marshal(authkey)
 		if err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR", "failure marshalling resullts", "err", err)
+			app.Logger(r.Context()).Error("vivian: [error]", "failure marshalling resullts", "err", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR", "failure writing search results", err)
+			app.Logger(r.Context()).Error("vivian: [error]", "failure writing search results", err)
 		}
 	})
 }
@@ -44,17 +42,17 @@ func VerifyTwoFactorAuth(ctx context.Context, app *App) http.Handler {
 
 		result, err := app.login.Get().VerifyAuthKey2FA(ctx, hash, input)
 		if err != nil {
-			app.Logger(ctx).Error("vivian: ERROR!", "unable to verify input", http.StatusNotAcceptable)
+			app.Logger(ctx).Error("vivian: [error]", "err", "unable to verify input")
 		}
 
 		bytes, err := json.Marshal(result)
 		if err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR!", "failure marshalling resullts", err)
+			app.Logger(r.Context()).Error("vivian: [error]", "err", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR!", "failure writing search results", err)
+			app.Logger(r.Context()).Error("vivian: [error]", "err", err)
 		}
 	})
 }
@@ -64,60 +62,40 @@ func EchoResponse(ctx context.Context, app *App) http.Handler {
 		query := strings.TrimSpace(r.URL.Query().Get("q"))
 		err := app.echo.Get().EchoResponse(ctx, query)
 		if err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR!", "err", http.StatusBadRequest)
+			app.Logger(r.Context()).Error("vivian: [error]", "err", http.StatusBadRequest)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		bytes, err := json.Marshal(query)
 		if err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR! failure marshalling resullts", "err", err)
+			app.Logger(r.Context()).Error("vivian: [error]", "err", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR! failure writing search results", "err", err)
+			app.Logger(r.Context()).Error("vivian: [error]", "err", err)
 		}
 	})
 }
 
-//func AddAccount(ctx context.Context, app *App) http.Handler {
+//func FetchUsers(ctx context.Context, app *App) http.Handler {
 //	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-//		query := strings.TrimSpace(r.URL.Query().Get("q"))
-//		result, err := app.add.Get().DatabaseAddAccount(ctx, query)
+//		result, err := database.FetchDatabaseData(ctx)
 //		if err != nil {
-//			app.Logger(r.Context()).Error("vivian: ERROR! cannot add user", "err", err)
+//			app.Logger(r.Context()).Error("vivian: [error]", "err", "cannot add user")
 //		}
-//
 //		bytes, err := json.Marshal(result)
 //		if err != nil {
-//			app.Logger(r.Context()).Error("vivian: ERROR! failure marshalling results", "err", err)
+//			app.Logger(r.Context()).Error("vivian: [error] failure marshalling results", "err", err)
 //			http.Error(w, err.Error(), http.StatusInternalServerError)
 //			return
 //		}
 //		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
-//			app.Logger(r.Context()).Error("vivian: ERROR! failure writing search results", "err", err)
+//			app.Logger(r.Context()).Error("vivian: [error] failure writing search results", "err", err)
 //		}
+//
 //	})
 //}
-
-func FetchUsers(ctx context.Context, app *App) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		result, err := database.FetchDatabaseData(ctx)
-		if err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR!", "err", "cannot add user")
-		}
-		bytes, err := json.Marshal(result)
-		if err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR! failure marshalling results", "err", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR! failure writing search results", "err", err)
-		}
-
-	})
-}
 
 func AccountLogin(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -129,18 +107,18 @@ func AccountLogin(ctx context.Context, app *App) http.Handler {
 		app.mux.Lock()
 		result, err := app.login.Get().Login(ctx, email, password)
 		if err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR! failure logging", "err", http.StatusBadRequest)
+			app.Logger(r.Context()).Error("vivian: [error] failure logging", "err", http.StatusBadRequest)
 		}
 		app.mux.Unlock()
 
 		bytes, err := json.Marshal(result)
 		if err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR! failure marshalling results", "err", err)
+			app.Logger(r.Context()).Error("vivian: [error] failure marshalling results", "err", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
-			app.Logger(r.Context()).Error("vivian: ERROR! failure writing search results", "err", err)
+			app.Logger(r.Context()).Error("vivian: [error] failure writing search results", "err", err)
 		}
 
 	})

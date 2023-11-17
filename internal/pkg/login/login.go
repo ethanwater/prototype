@@ -30,6 +30,7 @@ type Login interface {
 type impl struct {
 	weaver.Implements[Login]
 	tfa weaver.Ref[auth.Authenticator]
+	db  weaver.Ref[database.Database]
 }
 
 func (l *impl) Login(ctx context.Context, email string, password string) (bool, error) {
@@ -37,7 +38,7 @@ func (l *impl) Login(ctx context.Context, email string, password string) (bool, 
 	log := l.Logger(ctx)
 
 	if !auth.SanitizeEmailCheck(email) {
-		log.Error("vivian: ERROR! invalid email address", "err", http.StatusBadRequest)
+		log.Error("vivian: [error] invalid email address", "err", http.StatusBadRequest)
 		return false, nil
 	}
 
@@ -46,21 +47,25 @@ func (l *impl) Login(ctx context.Context, email string, password string) (bool, 
 	//	log.Error("vivian: ERROR! invalid password")
 	//	return false, nil
 	//}
-
-	fetchedAccount, err := database.FetchAccount(ctx, email)
+	fetchedAccount, err := l.db.Get().FetchAccount(ctx, email)
 	if err != nil {
-		log.Error("vivian: ERROR! failure fetching account, user does not exist", "err", http.StatusNotFound)
+		log.Error("vivian: [error] failure fetching account, user does not exist", "err", http.StatusNotFound)
 		return false, nil
 	}
 
-	//DAMN! this VerifyHash takes a while
-	if email == fetchedAccount.Email && auth.VerfiyHashPassword(fetchedAccount.Password, password) {
+	hashChannel := make(chan bool, 1)
+	go func() {
+		result := auth.VerfiyHashPassword(fetchedAccount.Password, password)
+		hashChannel <- result
+	}()
+
+	if email == fetchedAccount.Email && <-hashChannel {
 		totalSuccessfulAccountLogins.Inc()
-		log.Debug("vivian: SUCCESS! fetched account: ", "alias", fetchedAccount.Alias)
+		log.Debug("vivian: [ok] fetched account: ", "alias", fetchedAccount.Alias)
 		return true, nil
 	} else {
 		totalFailedAccountLogins.Inc()
-		log.Error("vivian: ERROR! invalid credentials", "err", http.StatusBadRequest)
+		log.Error("vivian: [error] invalid credentials", "err", http.StatusBadRequest)
 		return false, nil
 	}
 }

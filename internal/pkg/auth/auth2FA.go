@@ -54,11 +54,8 @@ type impl struct {
 }
 
 func (t *impl) GenerateAuthKey2FA(ctx context.Context) (string, error) {
+	generatedAuthKeys.Inc()
 	log := t.Logger(ctx)
-
-	var mu sync.Mutex
-	mu.Lock()
-	defer mu.Unlock()
 
 	source := rand.New(rand.NewSource(time.Now().Unix()))
 	var authKey strings.Builder
@@ -67,20 +64,27 @@ func (t *impl) GenerateAuthKey2FA(ctx context.Context) (string, error) {
 		sample := source.Intn(len(charset))
 		authKey.WriteString(string(charset[sample]))
 	}
-
-	//switch receiver.Receiver {
-	//case Email:
-	//	receiver.EmailSendAuthKey2FA(authKey.String())
-	//case Mobile:
-	//	receiver.MobileSendAuthKey2FA(authKey.String())
-	//}
-
 	fmt.Println(authKey.String())
-	authKeyHash, error := HashPassword(ctx, authKey.String())
 
-	generatedAuthKeys.Inc()
-	log.Debug("vivian: STATUS!", "authentication key generated", http.StatusOK)
-	return authKeyHash, error
+	hashChannel := make(chan string, 1)
+	go func() {
+		authKeyHash, err := HashPassword(ctx, authKey.String())
+		if err != nil {
+			log.Error("vivian: [error]", "err", "failure hashing the authentication key")
+			hashChannel <- ""
+			return
+		}
+		hashChannel <- authKeyHash
+	}()
+	hash := <-hashChannel
+
+	if hash == "" {
+		log.Error("vivian: [error]", "err", "failure hashing the authentication key")
+		return "", nil
+	}
+
+	log.Debug("vivian: [ok]", "authentication key generated", http.StatusOK)
+	return hash, nil
 }
 
 func (t *impl) VerifyAuthKey2FA(ctx context.Context, authkey_hash, input string) (bool, error) {
@@ -91,11 +95,11 @@ func (t *impl) VerifyAuthKey2FA(ctx context.Context, authkey_hash, input string)
 	if SanitizeCheck(input) {
 		status := bcrypt.CompareHashAndPassword([]byte(authkey_hash), []byte(input))
 		if status != nil {
-			t.Logger(ctx).Debug("vivian: WARNING!", "key invalid", http.StatusNotAcceptable)
+			t.Logger(ctx).Debug("vivian: [warning]", "key invalid", http.StatusNotAcceptable)
 			return status == nil, status
 		} else {
 			validAuthKeys.Inc()
-			t.Logger(ctx).Debug("vivian: SUCCESS!", "key verified", status == nil, "status", http.StatusOK)
+			t.Logger(ctx).Debug("vivian: [ok]", "key verified", status == nil, "status", http.StatusOK)
 			return status == nil, status
 		}
 	}
