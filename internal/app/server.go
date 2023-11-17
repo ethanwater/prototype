@@ -50,6 +50,6 @@ func Deploy(ctx context.Context, app *App) error {
 
 	//TODO: cant access webapp using ServeTLS on Multiprocess! Needs to be
 	//reconfigured
-	//return http.ServeTLS(app.listener, app.handler, "../../certificates/server.crt", "../../certificates/server.key")
-	return http.Serve(app.listener, app.handler)
+	return http.ServeTLS(app.listener, app.handler, "../../certificates/server.crt", "../../certificates/server.key")
+	//return http.Serve(app.listener, app.handler)
 }

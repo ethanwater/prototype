@@ -2,6 +2,26 @@ function strip(s) {
     return s.replace(/\s+/g, '');
 }
 
+function initCookie2FA(name, value) {
+    const d = new Date();
+    d.setTime(d.getTime() + (5 * 60 * 1000));
+    let expires = "expires=" + d.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+}
+
+function getCookie2FA(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i <ca.length; i++) {
+        let c = ca[i].trim();
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
 async function loginResponse(endpoint, email, password, aborter) {
     const response = await fetch(`/${endpoint}?q=${encodeURIComponent(email)}&p=${encodeURIComponent(password)}`, {
         signal: aborter.signal,
@@ -55,7 +75,7 @@ async function retrieveCode() {
 
     var controller = new AbortController();
     for (const endpoint of['verifykey']) {
-        const responseText = await verifyCode(endpoint, localStorage.getItem("key"), input.toUpperCase(), controller);
+        const responseText = await verifyCode(endpoint, getCookie2FA("vivian2FA"), input.toUpperCase(), controller);
         const results = JSON.parse(responseText);
 
         if (!results) {
@@ -155,10 +175,6 @@ function main() {
         if (ifVerifiedBasic == true) {
             return;
         }
-        //if (localStorage.getItem("locked") == "true") {
-        //    errorMessage("too many login attempts");
-        //    return;
-        //}
         if (attempts >= maxAttempts) {
             return;
         }
@@ -193,7 +209,6 @@ function main() {
                     } else if (attempts >= 5 && attempts < maxAttempts) {
                         errorMessage("invalid credentials".concat(attemptslog));
                     } else {
-                        //localStorage.setItem("locked", "true");
                         errorMessage("too many login attempts");
                         pass.value = "";
                         email.value = "";
@@ -216,7 +231,7 @@ function main() {
                             if (results == null || results.length == 0) {
                                 return;
                             }
-                            localStorage.setItem("key", results);
+                            document.cookie = initCookie2FA("vivian2FA", results) 
                         })
                     }
 
@@ -272,9 +287,5 @@ function main() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    main(); // Invoke the main function
+    main(); 
 });
-//window.onload = function() {
-//    const email = document.getElementById('email');
-//    email.value = localStorage.getItem('email');
-//}
