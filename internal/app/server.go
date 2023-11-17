@@ -2,16 +2,13 @@ package app
 
 import (
 	"context"
-	"database/sql"
 	"sync"
-	"vivianlab/database"
 	"vivianlab/internal/pkg/echo"
 	"vivianlab/internal/pkg/login"
 	"vivianlab/internal/pkg/utils"
 	"vivianlab/web"
 
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/ServiceWeaver/weaver"
@@ -29,8 +26,7 @@ type App struct {
 	rw_timeout time.Duration
 	mux        sync.Mutex
 
-	handler  http.Handler
-	database *sql.DB
+	handler http.Handler
 }
 
 func Deploy(ctx context.Context, app *App) error {
@@ -38,14 +34,7 @@ func Deploy(ctx context.Context, app *App) error {
 	app.handler = appHandler
 	app.rw_timeout = Timeout
 
-	//TODO: non repetitive database integration
-	sql, err := database.EstablishLinkDatabase(ctx)
-	if err != nil {
-		app.Logger(ctx).Warn("vivian: [fatal] cannot connect to database", "status", http.StatusNotFound)
-		os.Exit(13)
-	}
-	app.database = sql
-	app.Logger(ctx).Debug("vivian: [launch] sql", "connection", app.database.Ping() == nil)
+	//app.Logger(ctx).Debug("vivian: [launch] mysql", "connection", app.database.Get().Init(ctx) == nil)
 	app.Logger(ctx).Info("vivian: [launch] app", "address", app.listener)
 
 	//TODO: change handle names to be discreet
@@ -54,7 +43,6 @@ func Deploy(ctx context.Context, app *App) error {
 	//TODO: test all curl commands to verify the data the user recieves
 	appHandler.HandleFunc(weaver.HealthzURL, weaver.HealthzHandler)
 	appHandler.Handle("/", http.StripPrefix("/", http.FileServer(http.FS(web.WebUI))))
-	//appHandler.Handle("/fetch", FetchUsers(ctx, app))
 	appHandler.Handle("/login", weaver.InstrumentHandler("login", AccountLogin(ctx, app)))
 	appHandler.Handle("/login/generatekey", GenerateTwoFactorAuth(ctx, app))
 	appHandler.Handle("/login/verifykey", VerifyTwoFactorAuth(ctx, app))

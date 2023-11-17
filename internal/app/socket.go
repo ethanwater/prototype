@@ -31,7 +31,9 @@ func HandleWebSocketTimestamp(ctx context.Context, app *App) http.Handler {
 			for {
 				select {
 				case <-reconnectChannel:
-					app.utils.Get().LoggerSocket(ctx, "vivian: [ok] socket: reconnected")
+					if err := app.utils.Get().LoggerSocket(ctx, "vivian: [ok] socket: reconnected"); err != nil {
+						app.Logger(ctx).Error("vivian: socket: [error]", "err", err)
+					}
 					return
 				case <-ctx.Done():
 					app.Logger(ctx).Error("vivian: socket: [error]", "err", "context lost")
@@ -49,7 +51,9 @@ func HandleWebSocketTimestamp(ctx context.Context, app *App) http.Handler {
 				timestamp, _ := app.utils.Get().Time(ctx)
 				err := conn.WriteMessage(websocket.TextMessage, timestamp)
 				if err != nil {
-					app.utils.Get().LoggerSocket(ctx, "vivian: socket: [error] disconnected <- broken pipe ?")
+					if err := app.utils.Get().LoggerSocket(ctx, "vivian: socket: [error] disconnected <- broken pipe ?"); err != nil {
+						app.Logger(ctx).Error("vivian: socket: [error]", "err", err)
+					}
 					reconnectChannel <- 1
 					return
 				}

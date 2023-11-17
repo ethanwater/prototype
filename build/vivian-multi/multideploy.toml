@@ -6,3 +6,7 @@ binary = "./vivian-multi"
 
 [multi]
 listeners.vivian = {address = "localhost:2695"}
+
+["vivianlab/database/Database"]
+Driver = "mysql"
+Source = "root:@tcp(127.0.0.1:3306)/"

@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-
-	"vivianlab/database"
 )
 
 func Split(r rune) bool {
@@ -80,24 +78,24 @@ func EchoResponse(ctx context.Context, app *App) http.Handler {
 	})
 }
 
-func FetchUsers(ctx context.Context, app *App) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		result, err := database.FetchDatabaseData(ctx)
-		if err != nil {
-			app.Logger(r.Context()).Error("vivian: [error]", "err", "cannot add user")
-		}
-		bytes, err := json.Marshal(result)
-		if err != nil {
-			app.Logger(r.Context()).Error("vivian: [error] failure marshalling results", "err", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
-			app.Logger(r.Context()).Error("vivian: [error] failure writing search results", "err", err)
-		}
-
-	})
-}
+//func FetchUsers(ctx context.Context, app *App) http.Handler {
+//	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//		result, err := database.FetchDatabaseData(ctx)
+//		if err != nil {
+//			app.Logger(r.Context()).Error("vivian: [error]", "err", "cannot add user")
+//		}
+//		bytes, err := json.Marshal(result)
+//		if err != nil {
+//			app.Logger(r.Context()).Error("vivian: [error] failure marshalling results", "err", err)
+//			http.Error(w, err.Error(), http.StatusInternalServerError)
+//			return
+//		}
+//		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
+//			app.Logger(r.Context()).Error("vivian: [error] failure writing search results", "err", err)
+//		}
+//
+//	})
+//}
 
 func AccountLogin(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
