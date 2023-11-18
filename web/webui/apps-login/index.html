@@ -8,6 +8,25 @@
     <link rel="stylesheet" type="text/css" href="../css/loginaero.css" type="style.css">
 		<script type="text/javascript" src="login.js"></script>
     <script type="text/javascript" src="socket_timestamp.js" async></script>
+    <script>
+      //fix this, too janky
+     function focusNextInput(currentInput, event) {
+    var currentIndex = Array.from(document.querySelectorAll('.symbol')).indexOf(currentInput);
+
+    if (event.key =='Backspace') {
+        event.preventDefault(); // Prevent the default behavior of the backspace/delete key
+        var prevInput = document.querySelectorAll('.symbol')[currentIndex - 1];
+        if (prevInput) {
+            prevInput.focus();
+        }
+    } else {
+        var nextInput = document.querySelectorAll('.symbol')[currentIndex + 1];
+        if (nextInput) {
+            nextInput.focus();
+        }
+    }
+} 
+  </script>
   </head>
   <body>
     <div class="container">
@@ -29,13 +48,4 @@
 	</body>
 </html>
 
-<script>
-  function focusNextInput(currentInput) {
-    var currentIndex = Array.from(document.querySelectorAll('.symbol')).indexOf(currentInput);
-    var nextInput = document.querySelectorAll('.symbol')[currentIndex + 1];
 
-			if (nextInput) {
-        nextInput.focus();
-    	}
-  }
-</script>

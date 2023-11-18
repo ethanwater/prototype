@@ -44,13 +44,13 @@ var (
 // The generated key will be hashed and stored via localStorage in JavaScript
 // and should be removed from localStorage cache once verified.
 
-type Authenticator interface {
+type T interface {
 	GenerateAuthKey2FA(context.Context) (string, error)
 	VerifyAuthKey2FA(context.Context, string, string) (bool, error)
 }
 
 type impl struct {
-	weaver.Implements[Authenticator]
+	weaver.Implements[T]
 }
 
 func (t *impl) GenerateAuthKey2FA(ctx context.Context) (string, error) {

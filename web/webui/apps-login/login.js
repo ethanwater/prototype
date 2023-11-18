@@ -107,8 +107,8 @@ function createVerificationElement() {
             input.id = "code" + i;
             input.type = "code";
             input.className = "symbol";
-            input.maxLength = 1;
-            input.setAttribute("oninput", "focusNextInput(this)");
+            //input.maxLength = 1;
+            input.setAttribute("oninput", "focusNextInput(this, event)");
             input.required = true;
 
             verificationDiv.appendChild(input);

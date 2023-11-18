@@ -23,6 +23,7 @@ type impl struct {
 }
 
 type config struct {
+	//weaver.InstanceOf[impl]
 	Driver string
 	Source string
 }
@@ -32,7 +33,8 @@ const MaxIdleConns, MaxOpenConns = 10, 20
 func (s *impl) Init(ctx context.Context) error {
 	database, _ := sql.Open(s.Config().Driver, s.Config().Source)
 	s.db = database
-	s.db.SetMaxIdleConns(MaxIdleConns); s.db.SetMaxOpenConns(MaxOpenConns)
+	s.db.SetMaxIdleConns(MaxIdleConns)
+	s.db.SetMaxOpenConns(MaxOpenConns)
 	s.Logger(ctx).Debug("vivian: [launch] mysql", "connection", s.db.Ping() == nil)
 
 	return s.db.Ping()

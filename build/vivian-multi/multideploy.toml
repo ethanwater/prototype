@@ -1,5 +1,5 @@
 [vivian]
-version = "alpha v2.1.0"
+version = "alpha v2.1.1"
 
 [serviceweaver]
 binary = "./vivian-multi"
@@ -10,3 +10,4 @@ listeners.vivian = {address = "localhost:2695"}
 ["vivianlab/database/Database"]
 Driver = "mysql"
 Source = "root:@tcp(127.0.0.1:3306)/"
+

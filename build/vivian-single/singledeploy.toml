@@ -1,5 +1,5 @@
 [vivian]
-version = "alpha v2.1.0"
+version = "alpha v2.1.1"
 
 [serviceweaver]
 binary = "vivian-single"

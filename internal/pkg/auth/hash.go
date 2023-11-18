@@ -9,30 +9,32 @@ import (
 const cost int = 13
 
 func HashPassword(_ context.Context, password string) (string, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), cost)
-	return string(hash), err
+	hashChannel := make(chan struct {
+		hash string
+		err  error
+	})
+	defer close(hashChannel)
+
+	go func() {
+		hash, err := bcrypt.GenerateFromPassword([]byte(password), cost)
+		hashChannel <- struct {
+			hash string
+			err  error
+		}{string(hash), err}
+	}()
+
+	result := <-hashChannel
+	return result.hash, result.err
 }
 
-// when called in register, should be processed in parallel. go func()
-//func HashPassword(password string) (string, error) {
-//	resultCh := make(chan struct {
-//		hash string
-//		err  error
-//	})
-//
-//	go func() {
-//		hash, err := bcrypt.GenerateFromPassword([]byte(password), cost)
-//		resultCh <- struct {
-//			hash string
-//			err  error
-//		}{string(hash), err}
-//	}()
-//
-//	result := <-resultCh
-//	return result.hash, result.err
-//}
-
 func VerfiyHashPassword(hash, password string) bool {
-	status := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return status == nil
+	verificationChannel := make(chan bool)
+	defer close(verificationChannel)
+
+	go func(){
+		status := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+		verificationChannel <- status==nil
+	}()
+
+	return <-verificationChannel
 }
