@@ -75,7 +75,6 @@ var socketSync sync.Mutex
 func SocketCalls(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		socketSync.Lock()
-		defer socketSync.Unlock()
 		if liveConn != nil { liveConn.Close() }
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
@@ -84,7 +83,8 @@ func SocketCalls(ctx context.Context, app *App) http.Handler {
 			app.Logger(ctx).Info("vivian: socket: [ok] handshake success", "remote", conn.RemoteAddr(), "local", conn.LocalAddr())
 		}
 		liveConn = conn
-	
+		socketSync.Unlock()
+
 		defer conn.Close()
 			
 		for {
