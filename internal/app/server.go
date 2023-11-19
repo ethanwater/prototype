@@ -32,7 +32,6 @@ func Deploy(ctx context.Context, app *App) error {
 	app.handler = appHandler
 	app.rw_timeout = 10 * time.Second
 
-
 	app.Logger(ctx).Info("vivian: [launch] app", "net", app.listener.Addr().Network(),
 		"address", app.listener.Addr().String())
 
@@ -45,6 +44,7 @@ func Deploy(ctx context.Context, app *App) error {
 	appHandler.Handle("/login/generatekey", GenerateTwoFactorAuth(ctx, app))
 	appHandler.Handle("/login/verifykey", VerifyTwoFactorAuth(ctx, app))
 	appHandler.Handle("/ws", HandleWebSocketTimestamp(ctx, app))
+	//TODO: appHandler.Handle("/wscalls", SocketCalls(ctx, app))
 	appHandler.HandleFunc(weaver.HealthzURL, weaver.HealthzHandler)
 
 	return http.ServeTLS(app.listener, app.handler, "../../certificates/server.crt", "../../certificates/server.key")
