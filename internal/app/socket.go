@@ -2,8 +2,10 @@ package app
 
 import (
 	"context"
-	"encoding/binary"
+	"fmt"
 	"net/http"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -15,8 +17,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-var socketCalls = 0
-
+var calls atomic.Int32
 func HandleWebSocketTimestamp(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
@@ -52,7 +53,8 @@ func HandleWebSocketTimestamp(ctx context.Context, app *App) http.Handler {
 				return
 			default:
 				timestamp, _ := app.utils.Get().Time(ctx)
-				socketCalls += 1
+				calls.Add(1)
+				//app.Logger(ctx).Debug(fmt.Sprint(uint32(calls.Load())))
 				err := conn.WriteMessage(websocket.TextMessage, timestamp)
 				if err != nil {
 					if err := app.utils.Get().LoggerSocket(ctx, "vivian: socket: [error] disconnected <- broken pipe ?"); err != nil {
@@ -67,49 +69,39 @@ func HandleWebSocketTimestamp(ctx context.Context, app *App) http.Handler {
 	})
 }
 
-// TODO:
+var liveConn *websocket.Conn
+var socketSync sync.Mutex
+
 func SocketCalls(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		socketSync.Lock()
+		defer socketSync.Unlock()
+		if liveConn != nil { liveConn.Close() }
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			app.Logger(ctx).Error("vivian: socket: [error] handshake failure", "err", "connection refused")
+			app.Logger(ctx).Error("vivian: socket: [error] handshake failure", "err", websocket.HandshakeError{})
 		} else {
 			app.Logger(ctx).Info("vivian: socket: [ok] handshake success", "remote", conn.RemoteAddr(), "local", conn.LocalAddr())
 		}
+		liveConn = conn
+	
 		defer conn.Close()
-
-		reconnectChannel := make(chan int)
-		defer close(reconnectChannel)
-
-		go func() {
-			for {
-				select {
-				case <-reconnectChannel:
-					if err := app.utils.Get().LoggerSocket(ctx, "vivian: [ok] socket: reconnected"); err != nil {
-						app.Logger(ctx).Error("vivian: socket: [error]", "err", err)
-					}
-					return
-				case <-ctx.Done():
-					app.Logger(ctx).Error("vivian: socket: [error]", "err", "context lost")
-					return
-				}
-			}
-		}()
-
+			
 		for {
+			var once sync.Once
 			select {
 			case <-ctx.Done():
 				app.Logger(ctx).Error("vivian: socket: [error]", "err", "context lost")
 				return
 			default:
-				byteArray := make([]byte, 4)
-				binary.BigEndian.PutUint32(byteArray, uint32(socketCalls))
-				err := conn.WriteMessage(websocket.TextMessage, byteArray)
+				once.Do(func(){
+					app.Logger(ctx).Debug("vivian: socket: [ok] timestamp.calls", "amt", uint32(calls.Load()))
+				})
+				err := liveConn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprint(uint32(calls.Load()))))
 				if err != nil {
 					if err := app.utils.Get().LoggerSocket(ctx, "vivian: socket: [error] disconnected <- broken pipe ?"); err != nil {
 						app.Logger(ctx).Error("vivian: socket: [error]", "err", err)
 					}
-					reconnectChannel <- 1
 					return
 				}
 				time.Sleep(time.Second)

@@ -1,7 +1,5 @@
-var socket = new WebSocket("wss://localhost:2695/ws", "protocolOne");
-var call = 0;
+var socket = new WebSocket("wss://localhost:2695/wscalls", "protocolTwo");
 
-// Create the chart instance
 var acquisitionsChart = new Chart(document.getElementById('acquisitions'), {
   type: 'bar',
   data: {
@@ -18,17 +16,14 @@ socket.onopen = function(event) {
 };
 
 socket.onmessage = function(event) {
-  call++;
   const data = [
-    { deployment: 1, count: call },
+    { deployment: 1, count: event.data },
     { deployment: 2, count: 100 },
   ];
 
-  // Update chart data
   acquisitionsChart.data.labels = data.map(row => "deployment: " + row.deployment);
   acquisitionsChart.data.datasets[0].data = data.map(row => row.count);
   
-  // Update the chart
   acquisitionsChart.update();
 };
 
@@ -39,3 +34,10 @@ socket.onclose = function(event) {
 socket.onerror = function(event) {
   console.error("WebSocket error:", event);
 };
+
+window.addEventListener('beforeunload', function(event) {
+  if (socket.readyState === WebSocket.OPEN) {
+      socket.close();
+  }
+});
+
