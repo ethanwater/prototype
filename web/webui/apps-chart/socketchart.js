@@ -16,9 +16,10 @@ socket.onopen = function(event) {
 };
 
 socket.onmessage = function(event) {
+  var socketData = JSON.parse(event.data);
   const data = [
-    { deployment: 1, count: event.data },
-    { deployment: 2, count: 100 },
+    { deployment: 1, count: socketData },
+    { deployment: 2, count: 50 },
   ];
 
   acquisitionsChart.data.labels = data.map(row => "deployment: " + row.deployment);
@@ -26,6 +27,19 @@ socket.onmessage = function(event) {
   
   acquisitionsChart.update();
 };
+
+//socket.onmessage = function(event) {
+//  var socketData = JSON.parse(event.data);
+//  const data = [
+//    { deployment: 1, count: socketData.success },
+//    { deployment: 2, count: socketData.failure },
+//  ];
+//
+//  acquisitionsChart.data.labels = data.map(row => "deployment: " + row.deployment);
+//  acquisitionsChart.data.datasets[0].data = data.map(row => row.count);
+//  
+//  acquisitionsChart.update();
+//};
 
 socket.onclose = function(event) {
   console.log("WebSocket connection closed.");

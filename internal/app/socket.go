@@ -2,7 +2,7 @@ package app
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 	"net/http"
 	"sync"
 	"sync/atomic"
@@ -18,6 +18,7 @@ var upgrader = websocket.Upgrader{
 }
 
 var calls atomic.Int32
+
 func HandleWebSocketTimestamp(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
@@ -71,20 +72,25 @@ func HandleWebSocketTimestamp(ctx context.Context, app *App) http.Handler {
 var liveConn *websocket.Conn
 var socketSync sync.Mutex
 
+//type liveData struct {
+//	X uint32 `json:"success"`
+//	Y uint32 `json:"failure"`
+//}
+
 func SocketCalls(ctx context.Context, app *App) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			app.Logger(ctx).Error("vivian: socket: [error] handshake failure", "err", websocket.HandshakeError{})
 			return
-		} 
+		}
 		defer conn.Close()
-		
+
 		app.Logger(ctx).Info("vivian: socket: [ok] handshake success", "remote", conn.RemoteAddr(), "local", conn.LocalAddr())
 
 		socketSync.Lock()
-		if liveConn != nil { 
-			liveConn.Close() 
+		if liveConn != nil {
+			liveConn.Close()
 		}
 		socketSync.Unlock()
 		liveConn = conn
@@ -105,19 +111,28 @@ func SocketCalls(ctx context.Context, app *App) http.Handler {
 					return
 				}
 			}
-		}()	
+		}()
 
-		var once sync.Once
+		//var once sync.Once
 		for {
 			select {
 			case <-ctx.Done():
 				app.Logger(ctx).Error("vivian: socket: [error]", "err", "context lost")
 				return
 			default:
-				once.Do(func(){
-					app.Logger(ctx).Debug("vivian: socket: [ok] timestamp.calls", "amt", uint32(calls.Load()))
-				})
-				err := liveConn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprint(uint32(calls.Load()))))
+				//data := liveData{
+				//	X: uint32(login.LoginSuccess.Load()),
+				//	Y: uint32(login.LoginFailure.Load()),
+				//}
+				marshal_data, err := json.Marshal(uint32(calls.Load()))
+				if err != nil {
+					app.Logger(ctx).Error("vivian: socket: [error]", "err", "unable to marshalize data")
+				}
+				//log current count per refresh
+				//once.Do(func(){
+				//	app.Logger(ctx).Debug("vivian: socket: [ok] timestamp.calls", "amt", data)
+				//})
+				err = liveConn.WriteMessage(websocket.TextMessage, marshal_data)
 				if err != nil {
 					if err := app.utils.Get().LoggerSocket(ctx, "vivian: socket: [error] disconnected <- broken pipe ?"); err != nil {
 						app.Logger(ctx).Error("vivian: socket: [error]", "err", err)
