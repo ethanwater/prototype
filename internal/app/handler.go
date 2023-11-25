@@ -57,27 +57,29 @@ func VerifyTwoFactorAuth(ctx context.Context, app *App) http.Handler {
 	})
 }
 
-func EchoResponse(ctx context.Context, app *App) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		query := strings.TrimSpace(r.URL.Query().Get("q"))
-		err := app.echo.Get().EchoResponse(ctx, query)
-		if err != nil {
-			app.Logger(r.Context()).Error("vivian: [error]", "err", http.StatusBadRequest)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		bytes, err := json.Marshal(query)
-		if err != nil {
-			app.Logger(r.Context()).Error("vivian: [error]", "err", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
-			app.Logger(r.Context()).Error("vivian: [error]", "err", err)
-		}
-	})
-}
+//DEPERECATED
+//func EchoResponse(ctx context.Context, app *App) http.Handler {
+//	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//		query := strings.TrimSpace(r.URL.Query().Get("q"))
+//		err := app.echo.Get().EchoResponse(ctx, query)
+//		if err != nil {
+//			app.Logger(r.Context()).Error("vivian: [error]", "err", http.StatusBadRequest)
+//			http.Error(w, err.Error(), http.StatusInternalServerError)
+//			return
+//		}
+//		bytes, err := json.Marshal(query)
+//		if err != nil {
+//			app.Logger(r.Context()).Error("vivian: [error]", "err", err)
+//			http.Error(w, err.Error(), http.StatusInternalServerError)
+//			return
+//		}
+//		if _, err := fmt.Fprintln(w, string(bytes)); err != nil {
+//			app.Logger(r.Context()).Error("vivian: [error]", "err", err)
+//		}
+//	})
+//}
 
+//DEPRECATED
 //func FetchUsers(ctx context.Context, app *App) http.Handler {
 //	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 //		result, err := database.FetchDatabaseData(ctx)

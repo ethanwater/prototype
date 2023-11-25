@@ -1,4 +1,4 @@
-package utils
+package socket
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 
 type T interface {
 	Time(context.Context) ([]byte, error)
-	LoggerSocket(context.Context, string)  error
+	LoggerSocket(context.Context, string) error
 }
 
 type impl struct {

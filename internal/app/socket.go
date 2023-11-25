@@ -16,7 +16,6 @@ var upgrader = websocket.Upgrader{
 		return true
 	},
 }
-
 var calls atomic.Int32
 
 func HandleWebSocketTimestamp(ctx context.Context, app *App) http.Handler {
@@ -36,7 +35,7 @@ func HandleWebSocketTimestamp(ctx context.Context, app *App) http.Handler {
 			for {
 				select {
 				case <-reconnectChannel:
-					if err := app.utils.Get().LoggerSocket(ctx, "vivian: [ok] socket: reconnected"); err != nil {
+					if err := app.socket.Get().LoggerSocket(ctx, "vivian: socket: [ok] reconnected"); err != nil {
 						app.Logger(ctx).Error("vivian: socket: [error]", "err", err)
 					}
 					return
@@ -53,11 +52,11 @@ func HandleWebSocketTimestamp(ctx context.Context, app *App) http.Handler {
 				app.Logger(ctx).Error("vivian: socket: [error]", "err", "context lost")
 				return
 			default:
-				timestamp, _ := app.utils.Get().Time(ctx)
+				timestamp, _ := app.socket.Get().Time(ctx)
 				calls.Add(1)
 				err := conn.WriteMessage(websocket.TextMessage, timestamp)
 				if err != nil {
-					if err := app.utils.Get().LoggerSocket(ctx, "vivian: socket: [error] disconnected <- broken pipe ?"); err != nil {
+					if err := app.socket.Get().LoggerSocket(ctx, "vivian: socket: [error] disconnected <- broken pipe ?"); err != nil {
 						app.Logger(ctx).Error("vivian: socket: [error]", "err", err)
 					}
 					reconnectChannel <- 1
@@ -102,7 +101,7 @@ func SocketCalls(ctx context.Context, app *App) http.Handler {
 			for {
 				select {
 				case <-reconnectChannel:
-					if err := app.utils.Get().LoggerSocket(ctx, "vivian: [ok] socket: reconnected"); err != nil {
+					if err := app.socket.Get().LoggerSocket(ctx, "vivian: [ok] socket: reconnected"); err != nil {
 						app.Logger(ctx).Error("vivian: socket: [error]", "err", err)
 					}
 					return
@@ -134,7 +133,7 @@ func SocketCalls(ctx context.Context, app *App) http.Handler {
 				//})
 				err = liveConn.WriteMessage(websocket.TextMessage, marshal_data)
 				if err != nil {
-					if err := app.utils.Get().LoggerSocket(ctx, "vivian: socket: [error] disconnected <- broken pipe ?"); err != nil {
+					if err := app.socket.Get().LoggerSocket(ctx, "vivian: socket: [error] disconnected <- broken pipe ?"); err != nil {
 						app.Logger(ctx).Error("vivian: socket: [error]", "err", err)
 					}
 					reconnectChannel <- 1
