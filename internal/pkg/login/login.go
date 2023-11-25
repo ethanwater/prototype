@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	//"sync/atomic"
 	"vivianlab/database"
 	"vivianlab/internal/pkg/auth"
 	"vivianlab/internal/pkg/cache"
@@ -22,8 +21,6 @@ var (
 		"totalFailedAccountLogins",
 		"the total number of times impl.Login is called and fails retrieving an account",
 	)
-	//LoginSuccess atomic.Int32
-	//LoginFailure atomic.Int32
 )
 
 type T interface {
@@ -41,7 +38,6 @@ type impl struct {
 }
 
 func (l *impl) Login(ctx context.Context, email string, password string) (bool, error) {
-	//TODO: count impl attempts. OK on JS end, but can still be curled via term
 	log := l.Logger(ctx)
 
 	if !auth.SanitizeEmailCheck(email) {
@@ -78,7 +74,6 @@ func (l *impl) Login(ctx context.Context, email string, password string) (bool, 
 	}()
 
 	if email == fetchedAccount.Email && <-hashChannel {
-		//LoginSuccess.Add(1)
 		totalSuccessfulAccountLogins.Inc()
 		log.Debug("vivian: [ok] fetched account: ", "alias", fetchedAccount.Alias)
 		if err := l.cache.Get().Put(ctx, email, password); err != nil {
@@ -87,7 +82,6 @@ func (l *impl) Login(ctx context.Context, email string, password string) (bool, 
 		return true, nil
 	} else {
 		totalFailedAccountLogins.Inc()
-		//LoginFailure.Add(1)
 		log.Error("vivian: [error] invalid credentials", "err", http.StatusBadRequest)
 		return false, nil
 	}
