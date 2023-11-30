@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"sync"
 
 	"github.com/ServiceWeaver/weaver"
 	_ "github.com/go-sql-driver/mysql"
@@ -50,6 +51,9 @@ type Account struct {
 }
 
 func (s *impl) FetchAccount(_ context.Context, email string) (Account, error) {
+	var mux sync.Mutex
+	mux.Lock()
+	defer mux.Unlock()
 	var acc Account
 	_, err := s.db.Exec("USE vivian_users")
 	if err != nil {
@@ -76,6 +80,9 @@ func (s *impl) FetchAccount(_ context.Context, email string) (Account, error) {
 }
 
 func (s *impl) AddAccount(_ context.Context, account Account) error {
+	var mux sync.Mutex
+	mux.Lock()
+	defer mux.Unlock()
 	_, err := s.db.Exec("USE vivian_users")
 	if err != nil {
 		log.Fatal("Error selecting database", err)

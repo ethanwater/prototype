@@ -32,7 +32,7 @@ func (route) Put(ctx context.Context, key, value string) string { return key }
 func (c *impl) Get(ctx context.Context, key string) (string, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	c.Logger(ctx).Debug("vivian: [ok] cache tunneled")
+	c.Logger(ctx).Debug("vivian: [ok] retrieve successful")
 
 	return c.data[key], nil
 }
