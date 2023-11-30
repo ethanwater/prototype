@@ -23,7 +23,6 @@ type impl struct {
 }
 
 type config struct {
-	//weaver.InstanceOf[impl]
 	Driver string
 	Source string
 }
@@ -74,4 +73,30 @@ func (s *impl) FetchAccount(_ context.Context, email string) (Account, error) {
 		return Account{}, fmt.Errorf("failed to fetch account: %w", err)
 	}
 	return acc, nil
+}
+
+func (s *impl) AddAccount(_ context.Context, account Account) error {
+	_, err := s.db.Exec("USE vivian_users")
+	if err != nil {
+		log.Fatal("Error selecting database", err)
+	}
+
+	stmt, err := s.db.Prepare("SELECT * FROM users")
+	if err != nil {
+		return fmt.Errorf("failed to prepare statement: %w", err)
+	}
+	defer stmt.Close()
+
+	acc := account
+	err = stmt.QueryRow(acc).Scan(&acc.ID, &acc.Alias, &acc.Name, &acc.Email, &acc.Password, &acc.Tier)
+	if err != nil {
+		// Handle the error appropriately
+		if err == sql.ErrNoRows {
+			// No rows found, return a specific error or handle it accordingly
+			return fmt.Errorf("no account found for email: %w", err)
+		}
+		return fmt.Errorf("failed to fetch account: %w", err)
+	}
+
+	return err
 }
