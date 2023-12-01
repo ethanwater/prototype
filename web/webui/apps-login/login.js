@@ -91,6 +91,7 @@ async function retrieveCode() {
                 document.getElementById('error').style.display = 'none';
             }
             console.log(results);
+            window.location.assign("../apps-chart/index.html")
         }
     }
 }

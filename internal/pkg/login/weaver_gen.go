@@ -6,6 +6,7 @@ package login
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/ServiceWeaver/weaver"
 	"github.com/ServiceWeaver/weaver/runtime/codegen"
 	"go.opentelemetry.io/otel/codes"
@@ -431,4 +432,44 @@ func (s t_reflect_stub) Login(ctx context.Context, a0 string, a1 string) (r0 boo
 func (s t_reflect_stub) VerifyAuthKey2FA(ctx context.Context, a0 string, a1 string) (r0 bool, err error) {
 	err = s.caller("VerifyAuthKey2FA", ctx, []any{a0, a1}, []any{&r0})
 	return
+}
+
+// AutoMarshal implementations.
+
+var _ codegen.AutoMarshal = (*Account)(nil)
+
+type __is_Account[T ~struct {
+	weaver.AutoMarshal
+	ID       int
+	Alias    string
+	Name     string
+	Email    string
+	Password string
+	Tier     int
+}] struct{}
+
+var _ __is_Account[Account]
+
+func (x *Account) WeaverMarshal(enc *codegen.Encoder) {
+	if x == nil {
+		panic(fmt.Errorf("Account.WeaverMarshal: nil receiver"))
+	}
+	enc.Int(x.ID)
+	enc.String(x.Alias)
+	enc.String(x.Name)
+	enc.String(x.Email)
+	enc.String(x.Password)
+	enc.Int(x.Tier)
+}
+
+func (x *Account) WeaverUnmarshal(dec *codegen.Decoder) {
+	if x == nil {
+		panic(fmt.Errorf("Account.WeaverUnmarshal: nil receiver"))
+	}
+	x.ID = dec.Int()
+	x.Alias = dec.String()
+	x.Name = dec.String()
+	x.Email = dec.String()
+	x.Password = dec.String()
+	x.Tier = dec.Int()
 }

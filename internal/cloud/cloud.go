@@ -11,19 +11,6 @@ const (
 	DefaultBuffer   = 2048
 )
 
-type Cloud struct {
-	alias  string
-	local  *net.IPAddr
-	remote *net.IPAddr
-	conn   *net.IPConn
-	mux    sync.Mutex
-}
-
-
-func (c *Cloud) Init(alias string, local, remote *net.IPAddr) {
-	c.alias, c.local, c.remote = alias, local, remote
-}
-
 func resolveLocalRemoteIPAddr(NetworkProtocol, localAddr, remoteAddr string) (*net.IPAddr, *net.IPAddr, error) {
 	local, err := net.ResolveIPAddr(NetworkProtocol, localAddr)
 	if err != nil {
@@ -43,6 +30,19 @@ var cloudConnectionPool = sync.Pool{
 		return new(*net.IPConn)
 	},
 }
+type Cloud struct {
+	alias  string
+	local  *net.IPAddr
+	remote *net.IPAddr
+	conn   *net.IPConn
+	mux    sync.Mutex
+}
+
+
+func (c *Cloud) Init(alias string, local, remote *net.IPAddr) {
+	c.alias, c.local, c.remote = alias, local, remote
+}
+
 
 func (c *Cloud) CloudEstablishConnection(local_addr, remote_addr string) (*net.IPConn, error) {
 	local, remote, err := resolveLocalRemoteIPAddr(NetworkProtocol, local_addr, remote_addr)
@@ -64,9 +64,10 @@ func (c *Cloud) CloudEstablishConnection(local_addr, remote_addr string) (*net.I
 	return conn, err
 }
 
-var cloudTunnel = make(chan []byte, DefaultBuffer)
 
-func (*Cloud) Connect() (*net.IPConn, error) {
+func (c *Cloud) ConnectToCloud() (*net.IPConn, error) {
+	c.mux.Lock()
+	defer c.mux.Unlock()
 	connInterface := cloudConnectionPool.Get()
 	if connInterface == nil {
 		return nil, errors.New("no available connections in the pool")
@@ -79,4 +80,5 @@ func (*Cloud) Connect() (*net.IPConn, error) {
 
 	return conn, nil
 }
+
 

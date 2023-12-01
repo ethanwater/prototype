@@ -3,6 +3,7 @@ package login
 import (
 	"context"
 	"net/http"
+	"sync/atomic"
 
 	"vivianlab/database"
 	"vivianlab/internal/pkg/auth"
@@ -37,6 +38,18 @@ type impl struct {
 	db    weaver.Ref[database.Database]
 }
 
+type Account struct {
+	weaver.AutoMarshal
+	ID       int
+	Alias    string
+	Name     string
+	Email    string
+	Password string
+	Tier     int
+}
+
+var activeAccountEmail atomic.Value
+
 func (l *impl) Login(ctx context.Context, email string, password string) (bool, error) {
 	log := l.Logger(ctx)
 
@@ -45,22 +58,18 @@ func (l *impl) Login(ctx context.Context, email string, password string) (bool, 
 		return false, nil
 	}
 
-	//TODO: implement password sanitization (follows password requirement rules)
-	//if !utils.SanitizePasswordCheck(password) {
-	//	log.Error("vivian: ERROR! invalid password")
-	//	return false, nil
-	//}
 	fetchedAccount, err := l.db.Get().FetchAccount(ctx, email)
 	if err != nil {
 		log.Error("vivian: [error] failure fetching account, user does not exist", "err", http.StatusNotFound)
 		return false, nil
 	}
 
+	activeAccountEmail.Store(fetchedAccount.Email)
+
 	if resp, err := l.cache.Get().Get(ctx, email); err != nil {
 		log.Error("vivian: [error] no cache found", "err", weaver.RemoteCallError)
 	} else {
 		if password == resp {
-			//LoginSuccess.Add(1)
 			totalSuccessfulAccountLogins.Inc()
 			log.Debug("vivian: [ok] fetched account: ", "alias", fetchedAccount.Alias)
 			return true, nil
@@ -88,7 +97,8 @@ func (l *impl) Login(ctx context.Context, email string, password string) (bool, 
 }
 
 func (l *impl) GenerateAuthKey2FA(ctx context.Context) (string, error) {
-	authkey, err := l.tfa.Get().GenerateAuthKey2FA(ctx)
+	email := activeAccountEmail.Load().(string)
+	authkey, err := l.tfa.Get().GenerateAuthKey2FA(ctx, email)
 
 	return authkey, err
 }
