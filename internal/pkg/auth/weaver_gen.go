@@ -30,7 +30,7 @@ func init() {
 		ReflectStubFn: func(caller func(string, context.Context, []any, []any) error) any {
 			return t_reflect_stub{caller: caller}
 		},
-		RefData: "",
+		RefData: "⟦32302eb2:wEaVeReDgE:vivianlab/internal/pkg/auth/T→vivianlab/internal/pkg/sender/T⟧\n",
 	})
 }
 
@@ -52,7 +52,7 @@ type t_local_stub struct {
 // Check that t_local_stub implements the T interface.
 var _ T = (*t_local_stub)(nil)
 
-func (s t_local_stub) GenerateAuthKey2FA(ctx context.Context) (r0 string, err error) {
+func (s t_local_stub) GenerateAuthKey2FA(ctx context.Context, a0 string) (r0 string, err error) {
 	// Update metrics.
 	begin := s.generateAuthKey2FAMetrics.Begin()
 	defer func() { s.generateAuthKey2FAMetrics.End(begin, err != nil, 0, 0) }()
@@ -69,7 +69,7 @@ func (s t_local_stub) GenerateAuthKey2FA(ctx context.Context) (r0 string, err er
 		}()
 	}
 
-	return s.impl.GenerateAuthKey2FA(ctx)
+	return s.impl.GenerateAuthKey2FA(ctx, a0)
 }
 
 func (s t_local_stub) VerifyAuthKey2FA(ctx context.Context, a0 string, a1 string) (r0 bool, err error) {
@@ -103,7 +103,7 @@ type t_client_stub struct {
 // Check that t_client_stub implements the T interface.
 var _ T = (*t_client_stub)(nil)
 
-func (s t_client_stub) GenerateAuthKey2FA(ctx context.Context) (r0 string, err error) {
+func (s t_client_stub) GenerateAuthKey2FA(ctx context.Context, a0 string) (r0 string, err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
 	begin := s.generateAuthKey2FAMetrics.Begin()
@@ -132,11 +132,20 @@ func (s t_client_stub) GenerateAuthKey2FA(ctx context.Context) (r0 string, err e
 
 	}()
 
+	// Preallocate a buffer of the right size.
+	size := 0
+	size += (4 + len(a0))
+	enc := codegen.NewEncoder()
+	enc.Reset(size)
+
+	// Encode arguments.
+	enc.String(a0)
 	var shardKey uint64
 
 	// Call the remote method.
+	requestBytes = len(enc.Data())
 	var results []byte
-	results, err = s.stub.Run(ctx, 0, nil, shardKey)
+	results, err = s.stub.Run(ctx, 0, enc.Data(), shardKey)
 	replyBytes = len(results)
 	if err != nil {
 		err = errors.Join(weaver.RemoteCallError, err)
@@ -261,10 +270,15 @@ func (s t_server_stub) generateAuthKey2FA(ctx context.Context, args []byte) (res
 		}
 	}()
 
+	// Decode arguments.
+	dec := codegen.NewDecoder(args)
+	var a0 string
+	a0 = dec.String()
+
 	// TODO(rgrandl): The deferred function above will recover from panics in the
 	// user code: fix this.
 	// Call the local method.
-	r0, appErr := s.impl.GenerateAuthKey2FA(ctx)
+	r0, appErr := s.impl.GenerateAuthKey2FA(ctx, a0)
 
 	// Encode the results.
 	enc := codegen.NewEncoder()
@@ -309,8 +323,8 @@ type t_reflect_stub struct {
 // Check that t_reflect_stub implements the T interface.
 var _ T = (*t_reflect_stub)(nil)
 
-func (s t_reflect_stub) GenerateAuthKey2FA(ctx context.Context) (r0 string, err error) {
-	err = s.caller("GenerateAuthKey2FA", ctx, []any{}, []any{&r0})
+func (s t_reflect_stub) GenerateAuthKey2FA(ctx context.Context, a0 string) (r0 string, err error) {
+	err = s.caller("GenerateAuthKey2FA", ctx, []any{a0}, []any{&r0})
 	return
 }
 

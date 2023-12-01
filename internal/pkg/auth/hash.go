@@ -31,9 +31,9 @@ func VerfiyHashPassword(hash, password string) bool {
 	verificationChannel := make(chan bool)
 	defer close(verificationChannel)
 
-	go func(){
+	go func() {
 		status := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-		verificationChannel <- status==nil
+		verificationChannel <- status == nil
 	}()
 
 	return <-verificationChannel

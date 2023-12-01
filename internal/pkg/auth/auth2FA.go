@@ -9,12 +9,13 @@ import (
 	"sync"
 	"time"
 
+	"vivianlab/internal/pkg/sender"
+
 	"github.com/ServiceWeaver/weaver"
 	"github.com/ServiceWeaver/weaver/metrics"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Authentication Key Generation Config
 const (
 	charset     string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	authKeySize int    = 5
@@ -32,28 +33,17 @@ var (
 	)
 )
 
-// Receiver Config
-//type ReceiverType int
-//
-//const (
-//	Email ReceiverType = iota + 1
-//	Mobile
-//)
-
-// GenerateAuthKey2FA generates a 2FA authentication key.
-// The generated key will be hashed and stored via localStorage in JavaScript
-// and should be removed from localStorage cache once verified.
-
 type T interface {
-	GenerateAuthKey2FA(context.Context) (string, error)
+	GenerateAuthKey2FA(context.Context, string) (string, error)
 	VerifyAuthKey2FA(context.Context, string, string) (bool, error)
 }
 
 type impl struct {
 	weaver.Implements[T]
+	sender weaver.Ref[sender.T]
 }
 
-func (t *impl) GenerateAuthKey2FA(ctx context.Context) (string, error) {
+func (t *impl) GenerateAuthKey2FA(ctx context.Context, email string) (string, error) {
 	generatedAuthKeys.Inc()
 	log := t.Logger(ctx)
 
@@ -84,6 +74,7 @@ func (t *impl) GenerateAuthKey2FA(ctx context.Context) (string, error) {
 	}
 
 	log.Debug("vivian: [ok]", "authentication key generated", http.StatusOK)
+	t.sender.Get().SendVerificationCodeEmail(ctx, email, authKey.String())
 	return hash, nil
 }
 
