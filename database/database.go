@@ -14,6 +14,7 @@ import (
 type Database interface {
 	Init(context.Context) error
 	FetchAccount(context.Context, string) (Account, error)
+	AddAccount(context.Context, Account) error
 }
 
 type impl struct {
@@ -97,9 +98,7 @@ func (s *impl) AddAccount(_ context.Context, account Account) error {
 	acc := account
 	err = stmt.QueryRow(acc).Scan(&acc.ID, &acc.Alias, &acc.Name, &acc.Email, &acc.Password, &acc.Tier)
 	if err != nil {
-		// Handle the error appropriately
 		if err == sql.ErrNoRows {
-			// No rows found, return a specific error or handle it accordingly
 			return fmt.Errorf("no account found for email: %w", err)
 		}
 		return fmt.Errorf("failed to fetch account: %w", err)
