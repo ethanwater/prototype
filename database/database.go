@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"os"
 	"database/sql"
 	"fmt"
 	"log"
@@ -13,6 +14,7 @@ import (
 
 type Database interface {
 	Init(context.Context) error
+	PingDBConnection(context.Context) error
 	FetchAccount(context.Context, string) (Account, error)
 	AddAccount(context.Context, Account) error
 }
@@ -36,9 +38,23 @@ func (s *impl) Init(ctx context.Context) error {
 	s.db = database
 	s.db.SetMaxIdleConns(MaxIdleConns)
 	s.db.SetMaxOpenConns(MaxOpenConns)
-	s.Logger(ctx).Debug("vivian: [launch] mysql", "connection", s.db.Ping() == nil)
 
+	ping := s.db.Ping()
+	if ping != nil {
+		fmt.Print("vivian: [failure] mysql -> failed to establish connection. check if the sql server is live\n")
+		os.Exit(503)
+	}
+
+	s.Logger(ctx).Debug("vivian: [launch] mysql", "connection", s.db.Ping() == nil)
 	return s.db.Ping()
+}
+
+func (s *impl) PingDBConnection(ctx context.Context) error {
+	err := s.db.Ping(); if err != nil {
+		s.Logger(ctx).Error("vivian: [failure] mysql", "failed to establish connection", err)
+		return err 
+	}
+	return nil
 }
 
 type Account struct {

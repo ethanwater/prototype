@@ -51,6 +51,9 @@ type Account struct {
 var activeAccountEmail atomic.Value
 
 func (l *impl) Login(ctx context.Context, email string, password string) (bool, error) {
+	err := l.db.Get().PingDBConnection(ctx); if err != nil {
+		return false, err
+	}
 	log := l.Logger(ctx)
 
 	if !auth.SanitizeEmailCheck(email) {

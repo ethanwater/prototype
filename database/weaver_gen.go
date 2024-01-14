@@ -20,10 +20,10 @@ func init() {
 		Iface: reflect.TypeOf((*Database)(nil)).Elem(),
 		Impl:  reflect.TypeOf(impl{}),
 		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
-			return database_local_stub{impl: impl.(Database), tracer: tracer, fetchAccountMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/database/Database", Method: "FetchAccount", Remote: false}), initMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/database/Database", Method: "Init", Remote: false})}
+			return database_local_stub{impl: impl.(Database), tracer: tracer, addAccountMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/database/Database", Method: "AddAccount", Remote: false}), fetchAccountMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/database/Database", Method: "FetchAccount", Remote: false}), initMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/database/Database", Method: "Init", Remote: false}), pingDBConnectionMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/database/Database", Method: "PingDBConnection", Remote: false})}
 		},
 		ClientStubFn: func(stub codegen.Stub, caller string) any {
-			return database_client_stub{stub: stub, fetchAccountMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/database/Database", Method: "FetchAccount", Remote: true}), initMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/database/Database", Method: "Init", Remote: true})}
+			return database_client_stub{stub: stub, addAccountMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/database/Database", Method: "AddAccount", Remote: true}), fetchAccountMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/database/Database", Method: "FetchAccount", Remote: true}), initMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/database/Database", Method: "Init", Remote: true}), pingDBConnectionMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "vivianlab/database/Database", Method: "PingDBConnection", Remote: true})}
 		},
 		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
 			return database_server_stub{impl: impl.(Database), addLoad: addLoad}
@@ -44,14 +44,36 @@ var _ weaver.Unrouted = (*impl)(nil)
 // Local stub implementations.
 
 type database_local_stub struct {
-	impl                Database
-	tracer              trace.Tracer
-	fetchAccountMetrics *codegen.MethodMetrics
-	initMetrics         *codegen.MethodMetrics
+	impl                    Database
+	tracer                  trace.Tracer
+	addAccountMetrics       *codegen.MethodMetrics
+	fetchAccountMetrics     *codegen.MethodMetrics
+	initMetrics             *codegen.MethodMetrics
+	pingDBConnectionMetrics *codegen.MethodMetrics
 }
 
 // Check that database_local_stub implements the Database interface.
 var _ Database = (*database_local_stub)(nil)
+
+func (s database_local_stub) AddAccount(ctx context.Context, a0 Account) (err error) {
+	// Update metrics.
+	begin := s.addAccountMetrics.Begin()
+	defer func() { s.addAccountMetrics.End(begin, err != nil, 0, 0) }()
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.tracer.Start(ctx, "database.Database.AddAccount", trace.WithSpanKind(trace.SpanKindInternal))
+		defer func() {
+			if err != nil {
+				span.RecordError(err)
+				span.SetStatus(codes.Error, err.Error())
+			}
+			span.End()
+		}()
+	}
+
+	return s.impl.AddAccount(ctx, a0)
+}
 
 func (s database_local_stub) FetchAccount(ctx context.Context, a0 string) (r0 Account, err error) {
 	// Update metrics.
@@ -93,16 +115,93 @@ func (s database_local_stub) Init(ctx context.Context) (err error) {
 	return s.impl.Init(ctx)
 }
 
+func (s database_local_stub) PingDBConnection(ctx context.Context) (err error) {
+	// Update metrics.
+	begin := s.pingDBConnectionMetrics.Begin()
+	defer func() { s.pingDBConnectionMetrics.End(begin, err != nil, 0, 0) }()
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.tracer.Start(ctx, "database.Database.PingDBConnection", trace.WithSpanKind(trace.SpanKindInternal))
+		defer func() {
+			if err != nil {
+				span.RecordError(err)
+				span.SetStatus(codes.Error, err.Error())
+			}
+			span.End()
+		}()
+	}
+
+	return s.impl.PingDBConnection(ctx)
+}
+
 // Client stub implementations.
 
 type database_client_stub struct {
-	stub                codegen.Stub
-	fetchAccountMetrics *codegen.MethodMetrics
-	initMetrics         *codegen.MethodMetrics
+	stub                    codegen.Stub
+	addAccountMetrics       *codegen.MethodMetrics
+	fetchAccountMetrics     *codegen.MethodMetrics
+	initMetrics             *codegen.MethodMetrics
+	pingDBConnectionMetrics *codegen.MethodMetrics
 }
 
 // Check that database_client_stub implements the Database interface.
 var _ Database = (*database_client_stub)(nil)
+
+func (s database_client_stub) AddAccount(ctx context.Context, a0 Account) (err error) {
+	// Update metrics.
+	var requestBytes, replyBytes int
+	begin := s.addAccountMetrics.Begin()
+	defer func() { s.addAccountMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
+
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.stub.Tracer().Start(ctx, "database.Database.AddAccount", trace.WithSpanKind(trace.SpanKindClient))
+	}
+
+	defer func() {
+		// Catch and return any panics detected during encoding/decoding/rpc.
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+			if err != nil {
+				err = errors.Join(weaver.RemoteCallError, err)
+			}
+		}
+
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+		}
+		span.End()
+
+	}()
+
+	// Preallocate a buffer of the right size.
+	size := 0
+	size += serviceweaver_size_Account_138228fa(&a0)
+	enc := codegen.NewEncoder()
+	enc.Reset(size)
+
+	// Encode arguments.
+	(a0).WeaverMarshal(enc)
+	var shardKey uint64
+
+	// Call the remote method.
+	requestBytes = len(enc.Data())
+	var results []byte
+	results, err = s.stub.Run(ctx, 0, enc.Data(), shardKey)
+	replyBytes = len(results)
+	if err != nil {
+		err = errors.Join(weaver.RemoteCallError, err)
+		return
+	}
+
+	// Decode the results.
+	dec := codegen.NewDecoder(results)
+	err = dec.Error()
+	return
+}
 
 func (s database_client_stub) FetchAccount(ctx context.Context, a0 string) (r0 Account, err error) {
 	// Update metrics.
@@ -146,7 +245,7 @@ func (s database_client_stub) FetchAccount(ctx context.Context, a0 string) (r0 A
 	// Call the remote method.
 	requestBytes = len(enc.Data())
 	var results []byte
-	results, err = s.stub.Run(ctx, 0, enc.Data(), shardKey)
+	results, err = s.stub.Run(ctx, 1, enc.Data(), shardKey)
 	replyBytes = len(results)
 	if err != nil {
 		err = errors.Join(weaver.RemoteCallError, err)
@@ -193,7 +292,53 @@ func (s database_client_stub) Init(ctx context.Context) (err error) {
 
 	// Call the remote method.
 	var results []byte
-	results, err = s.stub.Run(ctx, 1, nil, shardKey)
+	results, err = s.stub.Run(ctx, 2, nil, shardKey)
+	replyBytes = len(results)
+	if err != nil {
+		err = errors.Join(weaver.RemoteCallError, err)
+		return
+	}
+
+	// Decode the results.
+	dec := codegen.NewDecoder(results)
+	err = dec.Error()
+	return
+}
+
+func (s database_client_stub) PingDBConnection(ctx context.Context) (err error) {
+	// Update metrics.
+	var requestBytes, replyBytes int
+	begin := s.pingDBConnectionMetrics.Begin()
+	defer func() { s.pingDBConnectionMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
+
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.stub.Tracer().Start(ctx, "database.Database.PingDBConnection", trace.WithSpanKind(trace.SpanKindClient))
+	}
+
+	defer func() {
+		// Catch and return any panics detected during encoding/decoding/rpc.
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+			if err != nil {
+				err = errors.Join(weaver.RemoteCallError, err)
+			}
+		}
+
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+		}
+		span.End()
+
+	}()
+
+	var shardKey uint64
+
+	// Call the remote method.
+	var results []byte
+	results, err = s.stub.Run(ctx, 3, nil, shardKey)
 	replyBytes = len(results)
 	if err != nil {
 		err = errors.Join(weaver.RemoteCallError, err)
@@ -242,13 +387,41 @@ var _ codegen.Server = (*database_server_stub)(nil)
 // GetStubFn implements the codegen.Server interface.
 func (s database_server_stub) GetStubFn(method string) func(ctx context.Context, args []byte) ([]byte, error) {
 	switch method {
+	case "AddAccount":
+		return s.addAccount
 	case "FetchAccount":
 		return s.fetchAccount
 	case "Init":
 		return s.init
+	case "PingDBConnection":
+		return s.pingDBConnection
 	default:
 		return nil
 	}
+}
+
+func (s database_server_stub) addAccount(ctx context.Context, args []byte) (res []byte, err error) {
+	// Catch and return any panics detected during encoding/decoding/rpc.
+	defer func() {
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+		}
+	}()
+
+	// Decode arguments.
+	dec := codegen.NewDecoder(args)
+	var a0 Account
+	(&a0).WeaverUnmarshal(dec)
+
+	// TODO(rgrandl): The deferred function above will recover from panics in the
+	// user code: fix this.
+	// Call the local method.
+	appErr := s.impl.AddAccount(ctx, a0)
+
+	// Encode the results.
+	enc := codegen.NewEncoder()
+	enc.Error(appErr)
+	return enc.Data(), nil
 }
 
 func (s database_server_stub) fetchAccount(ctx context.Context, args []byte) (res []byte, err error) {
@@ -295,6 +468,25 @@ func (s database_server_stub) init(ctx context.Context, args []byte) (res []byte
 	return enc.Data(), nil
 }
 
+func (s database_server_stub) pingDBConnection(ctx context.Context, args []byte) (res []byte, err error) {
+	// Catch and return any panics detected during encoding/decoding/rpc.
+	defer func() {
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+		}
+	}()
+
+	// TODO(rgrandl): The deferred function above will recover from panics in the
+	// user code: fix this.
+	// Call the local method.
+	appErr := s.impl.PingDBConnection(ctx)
+
+	// Encode the results.
+	enc := codegen.NewEncoder()
+	enc.Error(appErr)
+	return enc.Data(), nil
+}
+
 // Reflect stub implementations.
 
 type database_reflect_stub struct {
@@ -304,6 +496,11 @@ type database_reflect_stub struct {
 // Check that database_reflect_stub implements the Database interface.
 var _ Database = (*database_reflect_stub)(nil)
 
+func (s database_reflect_stub) AddAccount(ctx context.Context, a0 Account) (err error) {
+	err = s.caller("AddAccount", ctx, []any{a0}, []any{})
+	return
+}
+
 func (s database_reflect_stub) FetchAccount(ctx context.Context, a0 string) (r0 Account, err error) {
 	err = s.caller("FetchAccount", ctx, []any{a0}, []any{&r0})
 	return
@@ -311,6 +508,11 @@ func (s database_reflect_stub) FetchAccount(ctx context.Context, a0 string) (r0 
 
 func (s database_reflect_stub) Init(ctx context.Context) (err error) {
 	err = s.caller("Init", ctx, []any{}, []any{})
+	return
+}
+
+func (s database_reflect_stub) PingDBConnection(ctx context.Context) (err error) {
+	err = s.caller("PingDBConnection", ctx, []any{}, []any{})
 	return
 }
 
@@ -352,4 +554,20 @@ func (x *Account) WeaverUnmarshal(dec *codegen.Decoder) {
 	x.Email = dec.String()
 	x.Password = dec.String()
 	x.Tier = dec.Int()
+}
+
+// Size implementations.
+
+// serviceweaver_size_Account_138228fa returns the size (in bytes) of the serialization
+// of the provided type.
+func serviceweaver_size_Account_138228fa(x *Account) int {
+	size := 0
+	size += 0
+	size += 8
+	size += (4 + len(x.Alias))
+	size += (4 + len(x.Name))
+	size += (4 + len(x.Email))
+	size += (4 + len(x.Password))
+	size += 8
+	return size
 }
