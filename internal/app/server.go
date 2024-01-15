@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/ServiceWeaver/weaver"
+	"github.com/gorilla/mux"
 )
 
 type App struct {
@@ -21,25 +22,31 @@ type App struct {
 
 	rw_timeout time.Duration
 	mux        sync.Mutex
+}
 
-	handler http.Handler
+func (app *App) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	router := mux.NewRouter()
+
+	webui := http.FileServer(http.FS(web.WebUI))
+	router.PathPrefix("/").Handler(http.StripPrefix("/", webui))
+
+	router.Handle("/login", weaver.InstrumentHandler("login", AccountLogin(r.Context(), app)))
+	router.Handle("/login/generatekey", GenerateTwoFactorAuth(r.Context(), app)).Methods("GET")
+	router.Handle("/login/verifykey", VerifyTwoFactorAuth(r.Context(), app))
+	router.Handle("/ws", HandleWebSocketTimestamp(r.Context(), app))
+	router.Handle("/wscalls", SocketCalls(r.Context(), app))
+	router.HandleFunc(weaver.HealthzURL, weaver.HealthzHandler)
+
+	router.ServeHTTP(w, r)
 }
 
 func Deploy(ctx context.Context, app *App) error {
-	appHandler := http.NewServeMux()
-	app.handler = appHandler
 	app.rw_timeout = 10 * time.Second
 
 	app.Logger(ctx).Info("vivian: [launch] app", "net", app.listener.Addr().Network(),
 		"address", app.listener.Addr().String())
 
-	appHandler.Handle("/", http.StripPrefix("/", http.FileServer(http.FS(web.WebUI))))
-	appHandler.Handle("/login", weaver.InstrumentHandler("login", AccountLogin(ctx, app)))
-	appHandler.Handle("/login/generatekey", GenerateTwoFactorAuth(ctx, app))
-	appHandler.Handle("/login/verifykey", VerifyTwoFactorAuth(ctx, app))
-	appHandler.Handle("/ws", HandleWebSocketTimestamp(ctx, app))
-	appHandler.Handle("/wscalls", SocketCalls(ctx, app))
-	appHandler.HandleFunc(weaver.HealthzURL, weaver.HealthzHandler)
+	handler := &App{}
 
-	return http.ServeTLS(app.listener, app.handler, "../../certificates/server.crt", "../../certificates/server.key")
+	return http.Serve(app.listener, handler)
 }
